@@ -59,6 +59,26 @@ check("select: filters content type", ex.every((s) => s.content_type === "post")
   check("select: different seeds vary exemplars", a1 !== b, `both ${a1}`);
 }
 
+// dates are optional: a fully UNDATED pool must still get seeded variety
+{
+  await store.createVoice({
+    id: "nd", name: "ND", description: "d", identity: "You are ND.",
+    thinking: "", guidelines: "", default_type: "ad",
+  });
+  for (let i = 0; i < 20; i++) {
+    await store.addSpecimen({
+      voice_id: "nd", content_type: "ad", title: `Ad ${i}`, subtitle: "",
+      body: ("copy ".repeat(80) + i).trim(), quality: 3, source: "test", written_at: "",
+    });
+  }
+  const pool = await store.listSpecimens("nd");
+  const s1 = selectExemplars(pool, "ad", { seed: "brief A" }).map((s) => s.id).join(",");
+  const s2 = selectExemplars(pool, "ad", { seed: "brief B" }).map((s) => s.id).join(",");
+  const s3 = selectExemplars(pool, "ad", { seed: "brief A" }).map((s) => s.id).join(",");
+  check("select: undated pool still varies by brief", s1 !== s2, `both ${s1}`);
+  check("select: undated pool reproducible per brief", s1 === s3);
+}
+
 const msgs = buildGenerationMessages(v, ex, "post", "Test brief");
 check("prompt: system first", msgs[0].role === "system");
 check("prompt: system carries guidelines", msgs[0].content.includes("No tables."));

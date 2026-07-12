@@ -141,10 +141,12 @@ program
       n++;
     }
     console.log(`imported ${n} specimens into ${voiceId}`);
-    if (undated > 0) {
-      console.warn(
-        `WARNING: ${undated}/${n} specimens have no date. Exemplar selection spreads across time; ` +
-          `undated specimens weaken that. Add a '### YYYY-MM-DD' header line (after title/subtitle) to fix.`
+    if (undated > 0 && undated < n) {
+      // Mixed corpora only: partially-dated pools sort dated and undated
+      // specimens inconsistently. All-dated and all-undated are both fine.
+      console.log(
+        `note: ${undated}/${n} specimens are undated (dates are optional; if this voice's style ` +
+          `evolved over time, a '### YYYY-MM-DD' header line lets selection cover all eras).`
       );
     }
     await store.close();
