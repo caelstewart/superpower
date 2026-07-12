@@ -179,10 +179,12 @@ program
   .command("serve")
   .description("run the MCP server (stdio default)")
   .option("--http", "serve Streamable HTTP instead of stdio")
-  .option("--port <port>", "http port", "8787")
+  .option("--port <port>", "http port (defaults to $PORT, then 8787)")
   .action(async (opts) => {
-    if (opts.http) await serveHttp(parseInt(opts.port, 10));
-    else await serveStdio();
+    if (opts.http) {
+      const port = parseInt(opts.port ?? process.env.PORT ?? "8787", 10);
+      await serveHttp(port);
+    } else await serveStdio();
   });
 
 program
