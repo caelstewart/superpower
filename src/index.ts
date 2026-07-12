@@ -152,6 +152,30 @@ program
     await store.close();
   });
 
+const specimen = program.command("specimen").description("curate a voice's specimen pool");
+
+specimen
+  .command("list <voiceId>")
+  .option("--content-type <type>")
+  .description("list specimens (id, quality, type, date, title)")
+  .action(async (voiceId, opts) => {
+    const store = await createStore();
+    for (const s of await store.listSpecimens(voiceId, opts.contentType)) {
+      console.log(`#${s.id}\tq${s.quality}\t${s.content_type}\t${s.written_at || "-"}\t${s.title} (${s.word_count}w)`);
+    }
+    await store.close();
+  });
+
+specimen
+  .command("set-quality <voiceId> <id> <quality>")
+  .description("promote/demote a specimen (5 = killer set, owns exemplar slots)")
+  .action(async (voiceId, id, quality) => {
+    const store = await createStore();
+    const s = await store.updateSpecimen(voiceId, parseInt(id, 10), { quality: parseInt(quality, 10) });
+    console.log(s ? `#${s.id} → q${s.quality} · ${s.title}` : `no specimen #${id} in ${voiceId}`);
+    await store.close();
+  });
+
 program
   .command("rule <voiceId>")
   .description("add a lint rule")

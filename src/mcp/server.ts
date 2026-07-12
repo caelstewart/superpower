@@ -221,6 +221,58 @@ export function buildServer(store: Store): McpServer {
   );
 
   server.registerTool(
+    "list_specimens",
+    {
+      title: "List a voice's specimens for curation",
+      description:
+        "List a voice's stored specimens (id, quality 1-5, content type, date, title, word count) WITHOUT bodies. Use when curating a voice: reviewing what's in the pool, finding candidates to promote to the killer set (quality 5) or demote. Exemplar selection fills generation slots from the highest quality tier first, so quality IS the curation lever.",
+      inputSchema: {
+        voice: z.string().describe("voice id"),
+        content_type: z.string().optional().describe("filter to one content type"),
+      },
+    },
+    async ({ voice, content_type }) => {
+      const v = await store.getVoice(voice);
+      if (!v) return text(`Unknown voice "${voice}".`);
+      const specimens = await store.listSpecimens(voice, content_type);
+      if (specimens.length === 0) return text("No specimens.");
+      const byQ: Record<number, number> = {};
+      const lines = specimens.map((s) => {
+        byQ[s.quality] = (byQ[s.quality] ?? 0) + 1;
+        return `#${s.id} · q${s.quality} · ${s.content_type} · ${s.written_at || "undated"} · ${s.title} (${s.word_count}w)`;
+      });
+      const summary = Object.entries(byQ)
+        .sort((a, b) => Number(b[0]) - Number(a[0]))
+        .map(([q, n]) => `q${q}: ${n}`)
+        .join(", ");
+      return text(`${specimens.length} specimens (${summary}):\n${lines.join("\n")}`);
+    }
+  );
+
+  server.registerTool(
+    "update_specimen",
+    {
+      title: "Update a specimen's quality, type, or title",
+      description:
+        "Promote or demote a specimen in a voice's pool. quality 5 = killer set (owns generation exemplar slots — reserve for the voice's proven best work: top performers, best-converting, most representative), 4 = strong/approved, 3 = corpus, 2 = reference only, 1 = off-voice. Use during curation after list_specimens, or when the user says a piece is/isn't representative.",
+      inputSchema: {
+        voice: z.string().describe("voice id"),
+        id: z.number().int().describe("specimen id from list_specimens"),
+        quality: z.number().int().min(1).max(5).optional(),
+        content_type: z.string().optional(),
+        title: z.string().optional(),
+      },
+    },
+    async ({ voice, id, quality, content_type, title }) => {
+      const v = await store.getVoice(voice);
+      if (!v) return text(`Unknown voice "${voice}".`);
+      const s = await store.updateSpecimen(voice, id, { quality, content_type, title });
+      if (!s) return text(`No specimen #${id} in "${voice}".`);
+      return text(`Specimen #${s.id} → q${s.quality} · ${s.content_type} · "${s.title}"`);
+    }
+  );
+
+  server.registerTool(
     "update_voice",
     {
       title: "Edit a voice's guidelines, thinking, identity, or description",

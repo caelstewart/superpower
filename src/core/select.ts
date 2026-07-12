@@ -36,16 +36,24 @@ export function selectExemplars(
   let pool = specimens.filter((s) => s.content_type === contentType);
   if (pool.length < 2) pool = specimens;
 
-  // Highest quality first. Ties (common right after a bulk import, where
-  // quality and dates are uniform) break on a seed-dependent hash instead of
-  // insertion order — same brief reproduces the same exemplars, different
-  // briefs sample different corners of the corpus. No voice-specific logic.
-  const byQuality = [...pool].sort(
-    (a, b) =>
-      b.quality - a.quality ||
-      hash(seed + a.title + a.id) - hash(seed + b.title + b.id)
-  );
-  const top = byQuality.slice(0, Math.max(maxExemplars * 3, maxExemplars));
+  // QUALITY IS THE CURATION LEVER. Candidates accumulate from the highest
+  // quality tier downward and stop as soon as there's enough for variety —
+  // a curated "killer set" (quality 5) therefore owns the exemplar slots
+  // outright; lower tiers only ever fill gaps. Within a tier, ties break on
+  // a seed-dependent hash (common right after a bulk import, where quality
+  // is uniform): same brief reproduces the same exemplars, different briefs
+  // sample different corners of the corpus. No voice-specific logic.
+  const enough = maxExemplars * 2;
+  const tiers = [...new Set(pool.map((s) => s.quality))].sort((a, b) => b - a);
+  const top: Specimen[] = [];
+  for (const q of tiers) {
+    const tier = pool
+      .filter((s) => s.quality === q)
+      .sort((a, b) => hash(seed + a.title + a.id) - hash(seed + b.title + b.id));
+    top.push(...tier);
+    if (top.length >= enough) break;
+  }
+  top.splice(Math.max(enough, maxExemplars)); // cap candidate pool
   top.sort((a, b) => (a.written_at || a.created_at).localeCompare(b.written_at || b.created_at));
 
   // Window-based time spread: divide the (chronological) candidates into one

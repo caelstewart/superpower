@@ -39,6 +39,7 @@ export interface Store {
   deleteVoice(id: string): Promise<boolean>;
   listVoices(): Promise<Voice[]>;
   addSpecimen(s: Omit<Specimen, "id" | "created_at" | "word_count">): Promise<Specimen>;
+  updateSpecimen(voiceId: string, id: number, fields: Partial<Pick<Specimen, "quality" | "content_type" | "title">>): Promise<Specimen | null>;
   listSpecimens(voiceId: string, contentType?: string): Promise<Specimen[]>;
   countSpecimens(voiceId: string): Promise<number>;
   addLintRule(r: Omit<LintRule, "id" | "created_at">): Promise<LintRule>;
@@ -122,6 +123,31 @@ export class SqliteStore implements Store {
     return this.db
       .prepare("SELECT * FROM specimens WHERE id = ?")
       .get(Number(res.lastInsertRowid)) as unknown as Specimen;
+  }
+
+  async updateSpecimen(
+    voiceId: string,
+    id: number,
+    fields: Partial<Pick<Specimen, "quality" | "content_type" | "title">>
+  ): Promise<Specimen | null> {
+    const allowed = ["quality", "content_type", "title"] as const;
+    const sets: string[] = [];
+    const vals: unknown[] = [];
+    for (const k of allowed) {
+      if (fields[k] !== undefined) {
+        sets.push(`${k} = ?`);
+        vals.push(fields[k]);
+      }
+    }
+    if (sets.length > 0) {
+      vals.push(voiceId, id);
+      this.db
+        .prepare(`UPDATE specimens SET ${sets.join(", ")} WHERE voice_id = ? AND id = ?`)
+        .run(...(vals as never[]));
+    }
+    return (this.db
+      .prepare("SELECT * FROM specimens WHERE voice_id = ? AND id = ?")
+      .get(voiceId, id) as unknown as Specimen) ?? null;
   }
 
   async listSpecimens(voiceId: string, contentType?: string): Promise<Specimen[]> {

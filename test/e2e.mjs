@@ -59,6 +59,34 @@ check("select: filters content type", ex.every((s) => s.content_type === "post")
   check("select: different seeds vary exemplars", a1 !== b, `both ${a1}`);
 }
 
+// quality tiers own the slots: a curated killer set must never be diluted
+// by lower-quality specimens, regardless of dates
+{
+  await store.createVoice({
+    id: "q", name: "Q", description: "d", identity: "You are Q.",
+    thinking: "", guidelines: "", default_type: "reel",
+  });
+  // 20 low-quality recent specimens vs 12 curated killers with OLD dates —
+  // the Instagram case: date logic must not promote low performers.
+  for (let i = 0; i < 20; i++) {
+    await store.addSpecimen({
+      voice_id: "q", content_type: "reel", title: `Flop ${i}`, subtitle: "",
+      body: ("meh ".repeat(80) + i).trim(), quality: 2, source: "test",
+      written_at: `2026-06-${String((i % 28) + 1).padStart(2, "0")}`,
+    });
+  }
+  for (let i = 0; i < 12; i++) {
+    await store.addSpecimen({
+      voice_id: "q", content_type: "reel", title: `Banger ${i}`, subtitle: "",
+      body: ("hit ".repeat(80) + i).trim(), quality: 5, source: "test",
+      written_at: `2023-01-${String(i + 1).padStart(2, "0")}`,
+    });
+  }
+  const picked = selectExemplars(await store.listSpecimens("q"), "reel", { seed: "any brief" });
+  check("select: killer set owns all slots", picked.every((s) => s.quality === 5),
+    picked.map((s) => `${s.title}(q${s.quality})`).join(","));
+}
+
 // dates are optional: a fully UNDATED pool must still get seeded variety
 {
   await store.createVoice({
@@ -116,9 +144,9 @@ await client.connect(transport);
 const tools = await client.listTools();
 const names = tools.tools.map((t) => t.name).sort();
 check(
-  "mcp: exposes 8 tools",
+  "mcp: exposes 10 tools",
   JSON.stringify(names) ===
-    JSON.stringify(["add_lint_rule", "create_voice", "critique_copy", "generate_copy", "get_voice_context", "list_voices", "save_specimen", "update_voice"]),
+    JSON.stringify(["add_lint_rule", "create_voice", "critique_copy", "generate_copy", "get_voice_context", "list_specimens", "list_voices", "save_specimen", "update_specimen", "update_voice"]),
   names.join(",")
 );
 
@@ -166,6 +194,18 @@ const badRegex = await client.callTool({
   arguments: { voice: VOICE, kind: "banned_pattern", value: "([", message: "broken" },
 });
 check("mcp: invalid regex rejected", badRegex.content[0].text.includes("Invalid regex"));
+
+// curation loop: list specimens, promote one to the killer set, verify
+const listed = await client.callTool({ name: "list_specimens", arguments: { voice: VOICE } });
+check("mcp: list_specimens shows pool with qualities", /#\d+ · q4 · post/.test(listed.content[0].text), listed.content[0].text.slice(0, 120));
+const firstId = parseInt(listed.content[0].text.match(/#(\d+)/)?.[1] ?? "0", 10);
+const promoted = await client.callTool({
+  name: "update_specimen",
+  arguments: { voice: VOICE, id: firstId, quality: 5 },
+});
+check("mcp: update_specimen promotes to q5", promoted.content[0].text.includes("→ q5"));
+const relisted = await client.callTool({ name: "list_specimens", arguments: { voice: VOICE } });
+check("mcp: promotion persisted", relisted.content[0].text.includes("q5: 1"));
 const unknown = await client.callTool({ name: "get_voice_context", arguments: { voice: "nope" } });
 check("mcp: unknown voice handled gracefully", unknown.content[0].text.includes("Unknown voice"));
 

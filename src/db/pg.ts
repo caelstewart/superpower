@@ -97,6 +97,31 @@ export class PgStore implements Store {
     return row!;
   }
 
+  async updateSpecimen(
+    voiceId: string,
+    id: number,
+    fields: Partial<Pick<Specimen, "quality" | "content_type" | "title">>
+  ): Promise<Specimen | null> {
+    const allowed = ["quality", "content_type", "title"] as const;
+    const sets: string[] = [];
+    const vals: unknown[] = [];
+    let i = 1;
+    for (const k of allowed) {
+      if (fields[k] !== undefined) {
+        sets.push(`${k} = $${i++}`);
+        vals.push(fields[k]);
+      }
+    }
+    if (sets.length > 0) {
+      vals.push(voiceId, id);
+      await this.pool.query(
+        `UPDATE specimens SET ${sets.join(", ")} WHERE voice_id = $${i++} AND id = $${i}`,
+        vals
+      );
+    }
+    return this.one<Specimen>("SELECT * FROM specimens WHERE voice_id = $1 AND id = $2", [voiceId, id]);
+  }
+
   async listSpecimens(voiceId: string, contentType?: string): Promise<Specimen[]> {
     if (contentType) {
       return this.all<Specimen>(
