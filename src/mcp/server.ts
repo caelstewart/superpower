@@ -156,7 +156,7 @@ export function buildServer(store: Store): McpServer {
     {
       title: "Save approved copy as a voice specimen",
       description:
-        "Save a finished, APPROVED piece of writing into a voice's specimen store so future generations learn from it. Call when the user approves/ships a piece of copy, or explicitly asks to add an example to a voice. Never save unapproved drafts.",
+        "Save a piece of writing into a voice's specimen store. Use quality 5 (BASE) for hand-picked exemplars you and the user judged exceptional — these own the generation prompt; quality 4 (APPROVED, the default) when the user approves shipped copy; quality 3 (ARCHIVE) for collected raw material. Never save unapproved drafts.",
       inputSchema: {
         voice: z.string().describe("voice id"),
         title: z.string().describe("short title for the piece"),
@@ -225,7 +225,7 @@ export function buildServer(store: Store): McpServer {
     {
       title: "List a voice's specimens for curation",
       description:
-        "List a voice's stored specimens (id, quality 1-5, content type, date, title, word count) WITHOUT bodies. Use when curating a voice: reviewing what's in the pool, finding candidates to promote to the killer set (quality 5) or demote. Exemplar selection fills generation slots from the highest quality tier first, so quality IS the curation lever.",
+        "List a voice's stored specimens (id, state, content type, date, title, word count) WITHOUT bodies. Specimens have three states: BASE (q5, hand-picked exemplars that own the generation prompt), APPROVED (q4, user-approved work), ARCHIVE (q3, collected material). Use when curating: reviewing the pool, finding what to promote to base or remove.",
       inputSchema: {
         voice: z.string().describe("voice id"),
         content_type: z.string().optional().describe("filter to one content type"),
@@ -254,7 +254,7 @@ export function buildServer(store: Store): McpServer {
     {
       title: "Update a specimen's quality, type, or title",
       description:
-        "Promote or demote a specimen in a voice's pool. quality 5 = killer set (owns generation exemplar slots — reserve for the voice's proven best work: top performers, best-converting, most representative), 4 = strong/approved, 3 = corpus, 2 = reference only, 1 = off-voice. Use during curation after list_specimens, or when the user says a piece is/isn't representative.",
+        "Change a specimen's state in a voice's pool: quality 5 = BASE (hand-picked exemplars — own the generation prompt; the voice's proven best work), 4 = APPROVED (user-approved, fills slots when base is thin), 3 = ARCHIVE (collected material). Use when you and the user judge a piece to be (or not be) base material. To remove entirely, use delete_specimen.",
       inputSchema: {
         voice: z.string().describe("voice id"),
         id: z.number().int().describe("specimen id from list_specimens"),

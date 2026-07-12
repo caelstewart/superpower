@@ -19,26 +19,42 @@ rules, or the thinking doc — in that order of likelihood.
 ## The default workflow: a small, hand-curated base
 
 Most voices should be built and maintained as a **small pool you fully control**:
-research/collect candidates, judge them (Step 3), save only the exceptional ones
-via `save_specimen` at quality 5, and add/remove over time (`save_specimen`,
-`delete_specimen`). With a pool of 8–15, every generation simply uses your picks —
-no selection machinery involved.
+gather candidates from wherever they come from, judge them (Step 3), save only the
+exceptional ones as **base** specimens, and add/remove over time. With a pool of
+8-15, every generation simply uses your picks — no selection machinery involved.
 
-## Quality labels (only matter when a pool outgrows the prompt)
+Candidates can come from ANY source — do not assume a research step:
+- the user pastes their best pieces into chat
+- you and the user co-write or refine examples together in the conversation
+- you research/scrape published work
+- an existing archive gets imported
+- previously generated copy the user approved
+The origin never matters; the judgment step (Step 3) is the same for all of them.
 
-`quality` (1–5) is a **label recording your/the user's judgment** — nothing in the
-system computes it. It exists for pools that grow beyond prompt size (a bulk-imported
-archive, months of accumulated approved copy): the server packs prompts from the
-highest label down, so your marked-best (q5) can never be outranked by recency,
-dates, or anything else. 5 = the base, 4 = strong/approved, 3 = archive, 2 =
-reference, 1 = off-voice. In a small curated pool you can ignore labels entirely.
+## Specimen states (only matter when a pool outgrows the prompt)
+
+Every specimen is in one of three named states — a record of your/the user's
+judgment; nothing in the system computes it:
+
+- **base** (stored as quality 5) — hand-picked exemplars. These own the
+  generation prompt.
+- **approved** (quality 4) — real, user-approved work. Fills prompt slots only
+  when the base is thin; the pool the next base picks graduate from.
+- **archive** (quality 3, the import default) — collected raw material. Used
+  only when base+approved don't fill the prompt.
+
+The server packs prompts base → approved → archive, so a base specimen can never
+be outranked by recency, dates, or anything else. In a small curated pool
+(everything base) states are invisible — every generation just uses your picks.
+Set states with `update_specimen` (quality: 5=base, 4=approved, 3=archive) or
+`save_specimen`'s quality field. To exclude something entirely, delete it.
 
 ## Step 1 — Frame the voice (5 minutes, with the user)
 
 Ask only what you can't infer:
 - Who/what is this voice? (person, brand, sub-brand)
 - What content types will it produce? (post, email, ad, reel-script, landing-page…)
-  One killer set **per content type** — an email killer set does not teach reels.
+  One base **per content type** — an email base does not teach reels.
 - Is there **performance data**? (views, CTR, replies, conversions, shares)
   This is gold; ask for it explicitly before falling back to taste.
 
@@ -50,9 +66,10 @@ actively hurt.
 
 Two paths; prefer the first:
 
-- **Curated (default):** research/collect candidates, judge them (Step 3), and
-  `save_specimen` only the winners at quality 5. The pool stays small and fully
-  intentional; remove misfires with `delete_specimen`.
+- **Curated (default):** gather candidates from any source (pasted, co-written
+  in chat, researched, exported), judge them (Step 3), and `save_specimen` only
+  the winners at quality 5 (base). The pool stays small and fully intentional;
+  remove misfires with `delete_specimen`.
 - **Archive dump (optional):** when the user has a large existing corpus, bulk-import
   it at default quality 3 (`superpower import <voice> <dir>`; headers: `# Title`,
   optional `## Subtitle`, optional `### YYYY-MM-DD`), then promote the base out of
@@ -65,11 +82,11 @@ Two paths; prefer the first:
 
 ## Step 3 — Judge the base (the heart of this skill — this is YOUR judgment)
 
-Select 8–15 specimens per content type for the base, in this priority order:
+Select 8-15 specimens per content type for the base, in this priority order:
 
 1. **Measured winners.** If performance data exists, it decides. The
    most-viewed reels, best-converting emails, most-replied posts — *these* are
-   the killer set, whatever your aesthetic opinion. Ask the user to map metrics
+   the base, whatever your aesthetic opinion. Ask the user to map metrics
    to titles if needed.
 2. **Voice-purity.** No data? Pick pieces where the voice is most distinctly
    *itself* — the ones a fan would recognize blind. The user's judgment beats
@@ -85,10 +102,10 @@ Anti-patterns — exclude even if popular: collabs/ghostwritten pieces, format
 experiments the user disowns, length outliers, pieces dominated by a one-off
 event, anything the user wouldn't want echoed back.
 
-Then **demote**: anything off-voice → q1/q2. Don't leave landmines at q3 in a
-thin corpus.
+Then **remove**: anything off-voice gets deleted (`delete_specimen`) — don't
+leave landmines in the archive of a thin corpus.
 
-Promote/demote with `update_specimen` (chat) or
+Set states with `update_specimen` (chat) or
 `superpower specimen set-quality <voice> <id> <q>` (CLI).
 
 ## Step 4 — Distill the two docs + hard rules
@@ -118,9 +135,9 @@ Read the killer set closely, then write:
 
 ## Step 6 — Maintenance loop
 
-- When the user approves shipped copy: `save_specimen` at q4. Periodically
-  review q4s — the best graduate to q5, replacing weaker killers. Keep the
-  killer set ~8–15; it's a roster with cuts, not a hall of fame.
+- When the user approves shipped copy: `save_specimen` as approved (q4).
+  Periodically review approved specimens — the best graduate to base, replacing
+  weaker ones. Keep the base ~8-15; it's a roster with cuts, not a hall of fame.
 - When the user says "it keeps doing X" → that's a lint rule, add it now.
 - New content type for an existing voice = new killer set (Step 3 again).
 

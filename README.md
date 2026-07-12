@@ -55,13 +55,44 @@ happens in-voice too.
 | `get_voice_context` | brainstorming — returns how the voice thinks + its rules |
 | `generate_copy` | actual copy is needed (never written by the host agent) |
 | `critique_copy` | existing copy needs checking against a voice |
-| `save_specimen` | the user approves a piece — the voice compounds |
+| `save_specimen` | adding an example: hand-picked base (q5), approved work (q4), raw material (q3) |
+| `delete_specimen` | removing an example the user rejects |
+| `list_specimens` | reviewing a voice's pool during curation |
+| `update_specimen` | changing a specimen's state: base / approved / archive |
 | `create_voice` | onboarding a new person/brand |
 | `update_voice` | the user changes how a voice writes or thinks, from chat |
 | `add_lint_rule` | the user states a hard prohibition ("never use em dashes") |
 
 Every voice owns its own guidelines, thinking framework, specimen pool, and lint
-rules — all editable from inside the chat via `update_voice` / `add_lint_rule`.
+rules — all editable from inside the chat.
+
+### How the example base works
+
+The agent (with the user) is the judge of what's good — **the server never ranks
+or scores content**. Each specimen carries a named state recording that judgment:
+**base** (hand-picked exemplars — they own the generation prompt), **approved**
+(user-approved shipped work), **archive** (collected raw material). Prompts pack
+base → approved → archive, so a base example is never displaced by recency or any
+heuristic. The recommended shape is a small, fully intentional base of 8-15
+examples per content type, added and removed conversationally; large imported
+archives are optional raw material to promote from.
+
+### Claude Code commands
+
+The repo ships a skill at `skills/voice-capture/SKILL.md` with the full
+methodology for building a voice (judging the base, distilling rules, validating
+by generation). Install it once:
+
+```bash
+mkdir -p ~/.claude/skills/voice-capture
+cp skills/voice-capture/SKILL.md ~/.claude/skills/voice-capture/
+```
+
+Then in any Claude Code session: **`/voice-capture`** — or just ask to "capture
+someone's voice" / "build a voice from these examples" and the skill triggers.
+Day-to-day there are no commands to remember: the MCP tools auto-trigger on
+copywriting tasks, and curation is conversational ("that second example is
+perfect, add it to the base" / "drop the pricing one").
 
 ## Quickstart
 
