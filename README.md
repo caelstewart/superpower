@@ -124,10 +124,12 @@ node bin/superpower.js voice create acme \
   --identity "You are the Acme brand voice: a challenger skincare brand writing to skeptical repeat buyers." \
   --default-type email
 
-# bulk-import a directory of .txt files
-# header lines: "# Title", optional "## Subtitle", optional "### YYYY-MM-DD" (publish date)
-# dates matter: exemplar selection spreads across time, so date your specimens
+# optional: bulk-import an existing archive as raw material (state: archive)
+# header lines: "# Title", optional "## Subtitle", optional "### YYYY-MM-DD" (date, optional)
 node bin/superpower.js import acme ./acme-examples --content-type email
+# then promote the hand-picked base out of it:
+node bin/superpower.js specimen list acme
+node bin/superpower.js specimen set-quality acme <id> 5
 
 # per-voice style rules and thinking framework (markdown files, fully editable later from chat)
 node bin/superpower.js voice set-file acme guidelines ./acme-guidelines.md
