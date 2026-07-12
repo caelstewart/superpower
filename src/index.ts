@@ -94,7 +94,7 @@ voice
 
 program
   .command("import <voiceId> <dir>")
-  .description("bulk-import specimens from a directory of .txt files (first line '# Title', second optional '## Subtitle')")
+  .description("bulk-import specimens from a directory of .txt files (header lines: '# Title', optional '## Subtitle', optional '### YYYY-MM-DD')")
   .option("--content-type <type>", "content type for all files", "post")
   .option("--quality <n>", "quality 1-5", "3")
   .action(async (voiceId, dir, opts) => {
@@ -104,22 +104,30 @@ program
       process.exit(1);
     }
     let n = 0;
+    let undated = 0;
     for (const f of readdirSync(dir).filter((f) => f.endsWith(".txt"))) {
       const raw = readFileSync(join(dir, f), "utf8");
       const lines = raw.split("\n");
       let title = basename(f, ".txt");
       let subtitle = "";
+      let writtenAt = "";
       let bodyStart = 0;
       if (lines[0]?.startsWith("# ")) {
         title = lines[0].slice(2).trim();
         bodyStart = 1;
-        if (lines[1]?.startsWith("## ")) {
-          subtitle = lines[1].slice(3).trim();
-          bodyStart = 2;
+        if (lines[bodyStart]?.startsWith("## ")) {
+          subtitle = lines[bodyStart].slice(3).trim();
+          bodyStart++;
+        }
+        const dateLine = lines[bodyStart]?.match(/^### (\d{4}-\d{2}-\d{2})\s*$/);
+        if (dateLine) {
+          writtenAt = dateLine[1];
+          bodyStart++;
         }
       }
       const body = lines.slice(bodyStart).join("\n").trim();
       if (body.split(/\s+/).length < 50) continue; // skip stubs
+      if (!writtenAt) undated++;
       await store.addSpecimen({
         voice_id: voiceId,
         content_type: opts.contentType,
@@ -128,11 +136,17 @@ program
         body,
         quality: parseInt(opts.quality, 10),
         source: `import:${basename(dir)}`,
-        written_at: "",
+        written_at: writtenAt,
       });
       n++;
     }
     console.log(`imported ${n} specimens into ${voiceId}`);
+    if (undated > 0) {
+      console.warn(
+        `WARNING: ${undated}/${n} specimens have no date. Exemplar selection spreads across time; ` +
+          `undated specimens weaken that. Add a '### YYYY-MM-DD' header line (after title/subtitle) to fix.`
+      );
+    }
     await store.close();
   });
 

@@ -49,6 +49,16 @@ const ex = selectExemplars(await store.listSpecimens("t"), "post");
 check("select: returns <= 6 exemplars", ex.length <= 6 && ex.length >= 2, String(ex.length));
 check("select: filters content type", ex.every((s) => s.content_type === "post"));
 
+// seeded tie-breaking: uniform-quality pools must vary by brief, reproducibly
+{
+  const pool = await store.listSpecimens("t");
+  const a1 = selectExemplars(pool, "post", { seed: "brief A" }).map((s) => s.id).join(",");
+  const a2 = selectExemplars(pool, "post", { seed: "brief A" }).map((s) => s.id).join(",");
+  const b = selectExemplars(pool, "post", { seed: "brief B" }).map((s) => s.id).join(",");
+  check("select: same seed reproduces same exemplars", a1 === a2, `${a1} vs ${a2}`);
+  check("select: different seeds vary exemplars", a1 !== b, `both ${a1}`);
+}
+
 const msgs = buildGenerationMessages(v, ex, "post", "Test brief");
 check("prompt: system first", msgs[0].role === "system");
 check("prompt: system carries guidelines", msgs[0].content.includes("No tables."));

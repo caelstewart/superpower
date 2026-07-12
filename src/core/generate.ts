@@ -25,7 +25,7 @@ export async function generateCopy(
       `voice "${voice.id}" has no specimens — import examples before generating`
     );
   }
-  const exemplars = selectExemplars(specimens, type);
+  const exemplars = selectExemplars(specimens, type, { seed: brief });
   const messages = buildGenerationMessages(voice, exemplars, type, brief);
 
   // Some endpoints (dev-grade inference, reasoning models that stall in the

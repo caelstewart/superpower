@@ -9,6 +9,17 @@ const CHARS_PER_TOKEN = 3.6; // rough but stable for English prose
 export interface SelectOptions {
   maxExemplars?: number;   // default 6 (blind-test-validated count)
   tokenBudget?: number;    // default 12000 tokens of exemplar bodies
+  seed?: string;           // deterministic tie-breaker (typically the brief)
+}
+
+/** Small deterministic string hash for stable, seed-dependent tie-breaking. */
+function hash(s: string): number {
+  let h = 2166136261;
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return h >>> 0;
 }
 
 export function selectExemplars(
@@ -18,14 +29,22 @@ export function selectExemplars(
 ): Specimen[] {
   const maxExemplars = opts.maxExemplars ?? 6;
   const tokenBudget = opts.tokenBudget ?? 12_000;
+  const seed = opts.seed ?? "";
 
   // Prefer exact content-type matches; fall back to the whole pool so a new
   // content type still gets the voice rather than nothing.
   let pool = specimens.filter((s) => s.content_type === contentType);
   if (pool.length < 2) pool = specimens;
 
-  // Highest quality first, then spread across time so one era doesn't dominate.
-  const byQuality = [...pool].sort((a, b) => b.quality - a.quality);
+  // Highest quality first. Ties (common right after a bulk import, where
+  // quality and dates are uniform) break on a seed-dependent hash instead of
+  // insertion order — same brief reproduces the same exemplars, different
+  // briefs sample different corners of the corpus. No voice-specific logic.
+  const byQuality = [...pool].sort(
+    (a, b) =>
+      b.quality - a.quality ||
+      hash(seed + a.title + a.id) - hash(seed + b.title + b.id)
+  );
   const top = byQuality.slice(0, Math.max(maxExemplars * 3, maxExemplars));
   top.sort((a, b) => (a.written_at || a.created_at).localeCompare(b.written_at || b.created_at));
 
