@@ -144,9 +144,9 @@ await client.connect(transport);
 const tools = await client.listTools();
 const names = tools.tools.map((t) => t.name).sort();
 check(
-  "mcp: exposes 10 tools",
+  "mcp: exposes 11 tools",
   JSON.stringify(names) ===
-    JSON.stringify(["add_lint_rule", "create_voice", "critique_copy", "generate_copy", "get_voice_context", "list_specimens", "list_voices", "save_specimen", "update_specimen", "update_voice"]),
+    JSON.stringify(["add_lint_rule", "create_voice", "critique_copy", "delete_specimen", "generate_copy", "get_voice_context", "list_specimens", "list_voices", "save_specimen", "update_specimen", "update_voice"]),
   names.join(",")
 );
 
@@ -206,6 +206,10 @@ const promoted = await client.callTool({
 check("mcp: update_specimen promotes to q5", promoted.content[0].text.includes("→ q5"));
 const relisted = await client.callTool({ name: "list_specimens", arguments: { voice: VOICE } });
 check("mcp: promotion persisted", relisted.content[0].text.includes("q5: 1"));
+const deleted = await client.callTool({ name: "delete_specimen", arguments: { voice: VOICE, id: firstId } });
+check("mcp: delete_specimen removes from pool", deleted.content[0].text.includes("Pool: 5 specimens"), deleted.content[0].text);
+const deleted2 = await client.callTool({ name: "delete_specimen", arguments: { voice: VOICE, id: firstId } });
+check("mcp: deleting missing specimen handled", deleted2.content[0].text.includes("No specimen"));
 const unknown = await client.callTool({ name: "get_voice_context", arguments: { voice: "nope" } });
 check("mcp: unknown voice handled gracefully", unknown.content[0].text.includes("Unknown voice"));
 

@@ -273,6 +273,27 @@ export function buildServer(store: Store): McpServer {
   );
 
   server.registerTool(
+    "delete_specimen",
+    {
+      title: "Remove a specimen from a voice",
+      description:
+        "Permanently remove a specimen from a voice's pool. Use when the user rejects an example, when curating out off-voice material, or when replacing a weaker example with a better one. Confirm with the user before deleting anything they added themselves. For 'keep but never use in prompts', prefer update_specimen with quality 1-2.",
+      inputSchema: {
+        voice: z.string().describe("voice id"),
+        id: z.number().int().describe("specimen id from list_specimens"),
+      },
+    },
+    async ({ voice, id }) => {
+      const v = await store.getVoice(voice);
+      if (!v) return text(`Unknown voice "${voice}".`);
+      const ok = await store.deleteSpecimen(voice, id);
+      return text(ok
+        ? `Deleted specimen #${id} from "${voice}". Pool: ${await store.countSpecimens(voice)} specimens.`
+        : `No specimen #${id} in "${voice}".`);
+    }
+  );
+
+  server.registerTool(
     "update_voice",
     {
       title: "Edit a voice's guidelines, thinking, identity, or description",

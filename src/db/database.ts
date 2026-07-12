@@ -40,6 +40,7 @@ export interface Store {
   listVoices(): Promise<Voice[]>;
   addSpecimen(s: Omit<Specimen, "id" | "created_at" | "word_count">): Promise<Specimen>;
   updateSpecimen(voiceId: string, id: number, fields: Partial<Pick<Specimen, "quality" | "content_type" | "title">>): Promise<Specimen | null>;
+  deleteSpecimen(voiceId: string, id: number): Promise<boolean>;
   listSpecimens(voiceId: string, contentType?: string): Promise<Specimen[]>;
   countSpecimens(voiceId: string): Promise<number>;
   addLintRule(r: Omit<LintRule, "id" | "created_at">): Promise<LintRule>;
@@ -148,6 +149,13 @@ export class SqliteStore implements Store {
     return (this.db
       .prepare("SELECT * FROM specimens WHERE voice_id = ? AND id = ?")
       .get(voiceId, id) as unknown as Specimen) ?? null;
+  }
+
+  async deleteSpecimen(voiceId: string, id: number): Promise<boolean> {
+    const res = this.db
+      .prepare("DELETE FROM specimens WHERE voice_id = ? AND id = ?")
+      .run(voiceId, id);
+    return Number(res.changes) > 0;
   }
 
   async listSpecimens(voiceId: string, contentType?: string): Promise<Specimen[]> {

@@ -122,6 +122,14 @@ export class PgStore implements Store {
     return this.one<Specimen>("SELECT * FROM specimens WHERE voice_id = $1 AND id = $2", [voiceId, id]);
   }
 
+  async deleteSpecimen(voiceId: string, id: number): Promise<boolean> {
+    const res = await this.pool.query(
+      "DELETE FROM specimens WHERE voice_id = $1 AND id = $2",
+      [voiceId, id]
+    );
+    return (res.rowCount ?? 0) > 0;
+  }
+
   async listSpecimens(voiceId: string, contentType?: string): Promise<Specimen[]> {
     if (contentType) {
       return this.all<Specimen>(

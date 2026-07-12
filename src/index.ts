@@ -167,6 +167,16 @@ specimen
   });
 
 specimen
+  .command("delete <voiceId> <id>")
+  .description("remove a specimen from a voice")
+  .action(async (voiceId, id) => {
+    const store = await createStore();
+    const ok = await store.deleteSpecimen(voiceId, parseInt(id, 10));
+    console.log(ok ? `deleted specimen #${id}` : `no specimen #${id} in ${voiceId}`);
+    await store.close();
+  });
+
+specimen
   .command("set-quality <voiceId> <id> <quality>")
   .description("promote/demote a specimen (5 = killer set, owns exemplar slots)")
   .action(async (voiceId, id, quality) => {

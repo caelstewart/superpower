@@ -6,28 +6,32 @@ description: "Build or improve a superpower voice: curate a killer example set, 
 # Voice Capture — building a killer example set
 
 You are building a **voice** in superpower: a captured writing style that generates
-copy through few-shot demonstration. The single biggest quality lever is **which
-specimens sit in the killer set** (quality 5) — those own the generation exemplar
-slots. Everything in this skill exists to get ~8–15 genuinely great, representative
-specimens per content type, correctly ranked.
+copy through few-shot demonstration. The single biggest quality lever is the
+**example base**: ~8–15 genuinely great, representative specimens per content type.
+YOU (the agent, with the user) are the judge of what's great — the server never
+ranks or scores content; it only packs the specimens you've marked best into the
+generation prompt's token budget.
 
 Core principle (blind-test validated): **demonstration beats description.** Never
 try to fix a voice by adding style adjectives. Fix the specimens, the checkable
 rules, or the thinking doc — in that order of likelihood.
 
-## The quality scale (this is the contract with the selection engine)
+## The default workflow: a small, hand-curated base
 
-| q | Meaning | Effect |
-|---|---|---|
-| 5 | Killer set — the voice's proven best | Owns exemplar slots in every generation |
-| 4 | Strong / user-approved work | Fills slots only when q5 is thin |
-| 3 | Corpus — fine but unexceptional | Rarely selected; context of record |
-| 2 | Reference only | Never wanted in prompts |
-| 1 | Off-voice / wrong | Candidate for deletion |
+Most voices should be built and maintained as a **small pool you fully control**:
+research/collect candidates, judge them (Step 3), save only the exceptional ones
+via `save_specimen` at quality 5, and add/remove over time (`save_specimen`,
+`delete_specimen`). With a pool of 8–15, every generation simply uses your picks —
+no selection machinery involved.
 
-Selection fills slots from the highest tier down and only diversifies (by brief-seed,
-and by date *when dates exist*) **within** a tier. A low performer can never outrank
-a killer, regardless of recency.
+## Quality labels (only matter when a pool outgrows the prompt)
+
+`quality` (1–5) is a **label recording your/the user's judgment** — nothing in the
+system computes it. It exists for pools that grow beyond prompt size (a bulk-imported
+archive, months of accumulated approved copy): the server packs prompts from the
+highest label down, so your marked-best (q5) can never be outranked by recency,
+dates, or anything else. 5 = the base, 4 = strong/approved, 3 = archive, 2 =
+reference, 1 = off-voice. In a small curated pool you can ignore labels entirely.
 
 ## Step 1 — Frame the voice (5 minutes, with the user)
 
@@ -44,21 +48,24 @@ actively hurt.
 
 ## Step 2 — Gather candidates
 
-Collect 20–100+ raw candidates per content type (files, pasted text, scraped
-archives). Import everything at default quality 3 — bulk first, curate after.
-CLI for bulk: `superpower import <voice> <dir>` (headers: `# Title`, optional
-`## Subtitle`, optional `### YYYY-MM-DD`). Chat-scale: `save_specimen` with
-explicit quality.
+Two paths; prefer the first:
+
+- **Curated (default):** research/collect candidates, judge them (Step 3), and
+  `save_specimen` only the winners at quality 5. The pool stays small and fully
+  intentional; remove misfires with `delete_specimen`.
+- **Archive dump (optional):** when the user has a large existing corpus, bulk-import
+  it at default quality 3 (`superpower import <voice> <dir>`; headers: `# Title`,
+  optional `## Subtitle`, optional `### YYYY-MM-DD`), then promote the base out of
+  it in Step 3. The archive is raw material, not the base.
 
 > Content acquisition per platform (Instagram reels, YouTube transcripts, ad
 > libraries, email exports) is a separate, growing playbook — see
 > `ACQUISITION.md` in this skill's directory when it exists. Don't block on it;
 > curate whatever the user can provide today.
 
-## Step 3 — Curate the killer set (the heart of this skill)
+## Step 3 — Judge the base (the heart of this skill — this is YOUR judgment)
 
-Run `list_specimens` and select 8–15 per content type for promotion to q5, in
-this priority order:
+Select 8–15 specimens per content type for the base, in this priority order:
 
 1. **Measured winners.** If performance data exists, it decides. The
    most-viewed reels, best-converting emails, most-replied posts — *these* are
@@ -122,8 +129,9 @@ Read the killer set closely, then write:
 | Need | Tool |
 |---|---|
 | See the pool + quality distribution | `list_specimens` |
-| Promote/demote | `update_specimen` / CLI `specimen set-quality` |
 | Add examples | `save_specimen` / CLI `import` |
+| Remove examples | `delete_specimen` / CLI `specimen delete` |
+| Promote/demote in large pools | `update_specimen` / CLI `specimen set-quality` |
 | Edit rules & thinking | `update_voice` |
 | Hard prohibitions | `add_lint_rule` |
 | Test | `generate_copy`, `critique_copy` |
