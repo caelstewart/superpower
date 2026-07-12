@@ -170,7 +170,39 @@ for (const [title, body] of SPECIMENS) {
   });
 }
 const withSpecimens = await client.callTool({ name: "list_voices", arguments: {} });
-check("mcp: save_specimen grows the pool", withSpecimens.content[0].text.includes("6 specimens"));
+check("mcp: save_specimen grows the pool", withSpecimens.content[0].text.includes("6 approved"));
+check("mcp: roster nudges when no base", withSpecimens.content[0].text.includes("no hand-picked base yet"));
+
+// data-health pushback lifecycle: approved-only → nudge; +base → clean; archive-only → strong warning
+{
+  const ctxNoBase = await client.callTool({ name: "get_voice_context", arguments: { voice: VOICE } });
+  check("mcp: context raises no-base nudge", ctxNoBase.content[0].text.includes("Data health"));
+  const pool = await client.callTool({ name: "list_specimens", arguments: { voice: VOICE } });
+  const promoteId = parseInt(pool.content[0].text.match(/#(\d+)/)?.[1] ?? "0", 10);
+  await client.callTool({ name: "update_specimen", arguments: { voice: VOICE, id: promoteId, quality: 5 } });
+  const ctxWithBase = await client.callTool({ name: "get_voice_context", arguments: { voice: VOICE } });
+  check("mcp: nudge clears once base exists", !ctxWithBase.content[0].text.includes("Data health"));
+  await client.callTool({ name: "update_specimen", arguments: { voice: VOICE, id: promoteId, quality: 4 } });
+
+  const cleanupWeak = await createStore();
+  await cleanupWeak.deleteVoice("e2e-weak");
+  await cleanupWeak.close();
+  await client.callTool({
+    name: "create_voice",
+    arguments: { id: "e2e-weak", name: "Weak", description: "archive-only test voice", identity: "You are Weak." },
+  });
+  await client.callTool({
+    name: "save_specimen",
+    arguments: { voice: "e2e-weak", title: "Scraped thing", body: "raw ".repeat(60).trim(), quality: 3 },
+  });
+  const weakRoster = await client.callTool({ name: "list_voices", arguments: {} });
+  check("mcp: archive-only voice gets strong warning", weakRoster.content[0].text.includes("NO curated examples"));
+  const weakCtx = await client.callTool({ name: "get_voice_context", arguments: { voice: "e2e-weak" } });
+  check("mcp: archive-only context demands pushback", weakCtx.content[0].text.includes("VOICE DATA WARNING"));
+  const cleanupWeak2 = await createStore();
+  await cleanupWeak2.deleteVoice("e2e-weak");
+  await cleanupWeak2.close();
+}
 
 await client.callTool({
   name: "update_voice",

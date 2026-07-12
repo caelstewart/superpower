@@ -50,10 +50,16 @@ export function buildServer(store: Store): McpServer {
     async () => {
       const voices = await store.listVoices();
       const lines = await Promise.all(
-        voices.map(
-          async (v) =>
-            `- ${v.id} (“${v.name}”): ${v.description} [${await store.countSpecimens(v.id)} specimens, default type: ${v.default_type}]`
-        )
+        voices.map(async (v) => {
+          const h = await poolHealth(store, v.id);
+          const flag =
+            h.level === "weak"
+              ? " ⚠ NO curated examples — expect weak output; curate before relying on it"
+              : h.level === "no_base"
+                ? " (no hand-picked base yet)"
+                : "";
+          return `- ${v.id} (“${v.name}”): ${v.description} [${h.base} base + ${h.approved} approved + ${h.archive} archive, default type: ${v.default_type}]${flag}`;
+        })
       );
       return text(
         voices.length
@@ -76,12 +82,14 @@ export function buildServer(store: Store): McpServer {
     async ({ voice }) => {
       const v = await store.getVoice(voice);
       if (!v) return text(`Unknown voice "${voice}". Call list_voices for the roster.`);
+      const health = healthNote(await poolHealth(store, v.id), v.id);
       const parts = [
         `# Voice: ${v.name}`,
         `## Identity\n${v.identity}`,
         v.thinking && `## How ${v.name} thinks (use this during brainstorming)\n${v.thinking}`,
         v.guidelines && `## Hard style rules (apply to every draft)\n${v.guidelines}`,
         `When the user is ready for actual copy, do NOT write it yourself — call generate_copy with a brief.`,
+        health.trim() && `## Data health${health}`,
       ].filter(Boolean);
       return text(parts.join("\n\n"));
     }
@@ -114,14 +122,16 @@ export function buildServer(store: Store): McpServer {
       const result = await generateCopy(store, provider, v, brief, content_type, {
         temperature,
       });
+      const st = result.exemplarStates;
       const meta = [
         `voice: ${v.id}`,
-        `exemplars: ${result.exemplarCount}`,
+        `exemplars: ${result.exemplarCount} (${st.base} base, ${st.approved} approved, ${st.archive} archive)`,
         `model: ${result.model}`,
         result.revised ? "lint: revised once" : "lint: clean",
         ...result.warnings.map((w) => `warning: ${w}`),
       ].join(" · ");
-      return text(`${result.output}\n\n---\n_${meta}_`);
+      const health = healthNote(await poolHealth(store, v.id), v.id);
+      return text(`${result.output}\n\n---\n_${meta}_${health}`);
     }
   );
 
@@ -363,4 +373,36 @@ export function buildServer(store: Store): McpServer {
 
 function text(t: string) {
   return { content: [{ type: "text" as const, text: t }] };
+}
+
+type PoolHealth = { level: "ok" | "no_base" | "weak"; base: number; approved: number; archive: number };
+
+async function poolHealth(store: Store, voiceId: string): Promise<PoolHealth> {
+  const specimens = await store.listSpecimens(voiceId);
+  const base = specimens.filter((x) => x.quality >= 5).length;
+  const approved = specimens.filter((x) => x.quality === 4).length;
+  const archive = specimens.filter((x) => x.quality <= 3).length;
+  const level = base > 0 ? "ok" : approved > 0 ? "no_base" : "weak";
+  return { level, base, approved, archive };
+}
+
+function healthNote(h: PoolHealth, voiceId: string): string {
+  if (h.level === "weak") {
+    return (
+      `\n\n⚠ VOICE DATA WARNING for "${voiceId}": this voice has NO hand-picked base examples and NO approved work — ` +
+      `only ${h.archive} archive specimen(s) (unjudged raw material). Copy from this voice will be noticeably weaker. ` +
+      `TELL THE USER THIS PLAINLY and push to fix it before relying on the output: together, pick the 8-15 strongest ` +
+      `examples (their best-performing or most representative pieces — they can paste them, point you at sources, or ` +
+      `pick from the archive via list_specimens) and promote them to base (update_specimen quality 5, or save_specimen ` +
+      `quality 5 for new ones). The /voice-capture skill walks through this. Do not silently generate as if the voice were ready.`
+    );
+  }
+  if (h.level === "no_base") {
+    return (
+      `\n\nNote for "${voiceId}": no hand-picked base yet (${h.approved} approved, ${h.archive} archive). ` +
+      `Output is decent but not the voice at its best — suggest to the user that promoting their 8-15 favorite ` +
+      `examples to base (update_specimen quality 5) would raise quality.`
+    );
+  }
+  return "";
 }

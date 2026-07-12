@@ -55,6 +55,7 @@ export interface GenerationResult {
   provider: string;
   model: string;
   exemplarCount: number;
+  exemplarStates: { base: number; approved: number; archive: number };
   lintFailures: number;
   revised: boolean;
   durationMs: number;

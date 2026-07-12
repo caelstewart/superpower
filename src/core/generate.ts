@@ -26,6 +26,11 @@ export async function generateCopy(
     );
   }
   const exemplars = selectExemplars(specimens, type, { seed: brief });
+  const states = {
+    base: exemplars.filter((s) => s.quality >= 5).length,
+    approved: exemplars.filter((s) => s.quality === 4).length,
+    archive: exemplars.filter((s) => s.quality <= 3).length,
+  };
   const messages = buildGenerationMessages(voice, exemplars, type, brief);
 
   // Some endpoints (dev-grade inference, reasoning models that stall in the
@@ -68,6 +73,7 @@ export async function generateCopy(
     provider: provider.name,
     model: provider.model,
     exemplarCount: exemplars.length,
+    exemplarStates: states,
     lintFailures: errorCount(violations),
     revised,
     durationMs: Date.now() - started,
