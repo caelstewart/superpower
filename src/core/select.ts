@@ -48,10 +48,20 @@ export function selectExemplars(
   const top = byQuality.slice(0, Math.max(maxExemplars * 3, maxExemplars));
   top.sort((a, b) => (a.written_at || a.created_at).localeCompare(b.written_at || b.created_at));
 
-  const step = Math.max(1, Math.floor(top.length / maxExemplars));
+  // Window-based time spread: divide the (chronological) candidates into one
+  // window per exemplar slot and let the seed pick within each window. Keeps
+  // coverage across eras while different briefs sample different specimens.
   const spread: Specimen[] = [];
-  for (let i = 0; i < top.length && spread.length < maxExemplars; i += step) {
-    spread.push(top[i]);
+  const n = top.length;
+  if (n <= maxExemplars) {
+    spread.push(...top);
+  } else {
+    for (let i = 0; i < maxExemplars; i++) {
+      const start = Math.floor((i * n) / maxExemplars);
+      const end = Math.max(Math.floor(((i + 1) * n) / maxExemplars), start + 1);
+      const window = top.slice(start, end);
+      spread.push(window[hash(`${seed}:${i}`) % window.length]);
+    }
   }
 
   // Enforce token budget, dropping from the middle (keep oldest + newest poles).
