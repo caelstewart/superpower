@@ -26,7 +26,18 @@ function version(): string {
 }
 
 export function buildServer(store: Store): McpServer {
-  const server = new McpServer({ name: "superpower", version: version() });
+  const server = new McpServer(
+    { name: "superpower", version: version() },
+    {
+      instructions:
+        "superpower is the copywriting engine for this workspace. For any customer-facing " +
+        "writing task, route through its tools instead of writing copy directly. " +
+        "PRESENTATION RULE: whenever generate_copy returns, show the user the FULL generated " +
+        "copy verbatim in your reply — never summarize, excerpt, or describe it instead of " +
+        "showing it — unless the user explicitly asked you not to. The user must always see " +
+        "exactly what was generated. The same applies to critique_copy violation lists.",
+    }
+  );
 
   server.registerTool(
     "list_voices",
@@ -81,7 +92,7 @@ export function buildServer(store: Store): McpServer {
     {
       title: "Generate copy in a stored voice",
       description:
-        "Generate finished copy (posts, emails, ads, landing-page sections, product copy, social posts — ANY customer-facing text) in a stored voice. ALWAYS use this instead of writing marketing/content copy yourself: it assembles the voice's real specimens into a calibrated prompt server-side and produces far more faithful output than direct writing. Provide a specific brief: topic, angle, key points, audience.",
+        "Generate finished copy (posts, emails, ads, landing-page sections, product copy, social posts — ANY customer-facing text) in a stored voice. ALWAYS use this instead of writing marketing/content copy yourself: it assembles the voice's real specimens into a calibrated prompt server-side and produces far more faithful output than direct writing. Provide a specific brief: topic, angle, key points, audience. IMPORTANT: after this tool returns, present the full generated copy to the user verbatim — do not summarize or describe it in place of showing it.",
       inputSchema: {
         voice: z.string().describe("voice id from list_voices"),
         brief: z
