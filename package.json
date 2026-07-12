@@ -1,0 +1,40 @@
+{
+  "name": "@mergelabs/superpower",
+  "version": "0.1.0",
+  "description": "Superpower — invisible brand-voice engine for AI coding tools. MCP server + voice store + evidence-backed prompt assembly.",
+  "author": "Merge Labs",
+  "license": "SEE LICENSE IN LICENSE",
+  "type": "module",
+  "bin": {
+    "superpower": "bin/superpower.js"
+  },
+  "main": "dist/index.js",
+  "files": [
+    "dist",
+    "bin",
+    "src/db/schema.sql",
+    "README.md",
+    "LICENSE",
+    "VERSION"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json && cp src/db/schema.sql dist/db/schema.sql",
+    "dev": "tsc -p tsconfig.json --watch",
+    "test": "npm run build && node --no-warnings dist/../test-dist/e2e.js",
+    "serve": "node --no-warnings bin/superpower.js serve"
+  },
+  "engines": {
+    "node": ">=22.5.0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.0",
+    "commander": "^12.1.0",
+    "pg": "^8.22.0",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/pg": "^8.20.0",
+    "typescript": "^5.7.0"
+  }
+}

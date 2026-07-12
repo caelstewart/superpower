@@ -1,0 +1,9 @@
+node_modules
+dist
+test-dist
+*.db
+*.db-journal
+.env
+.git
+http.log
+seeds
