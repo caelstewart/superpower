@@ -115,13 +115,16 @@ Read the killer set closely, then write:
 - **guidelines** (`update_voice`, field `guidelines`): ≤12 rules, every one
   *checkable* ("never markdown tables", "sentences under 30 words", "opens with
   a question or a claim, never the title"). If you can't verify it mechanically
-  or by eye in 5 seconds, it's not a guideline, it's a vibe — cut it.
+  or by eye in 5 seconds, it's not a guideline, it's a vibe — cut it. Guidelines
+  inform brainstorming and are the SOURCE for lint rules; they do not enter the
+  generation prompt — enforcement is the lint engine's job, so every rule that
+  can be a lint rule MUST become one.
 - **thinking** (`update_voice`, field `thinking`): how this voice *develops
   ideas* — where topics come from, the characteristic move (reframe? teardown?
-  story-first?), what counts as evidence, how pieces open and close. Used in
-  BOTH phases: handed to the host agent for brainstorming AND included in the
-  server-side generation prompt. Write it from observation, not aspiration —
-  behaviors and structures, never style adjectives.
+  story-first?), what counts as evidence, how pieces open and close. Used by
+  the host agent during brainstorming. It does NOT enter the generation prompt
+  (ablation-tested: examples-only beat docs-in-prompt on every brief) — the
+  exemplars carry the voice; write thinking for ideation quality.
 - **lint rules** (`add_lint_rule`): every guideline that's mechanically
   checkable becomes one — banned strings/patterns, sentence caps. These
   auto-enforce with a revision pass on every generation.

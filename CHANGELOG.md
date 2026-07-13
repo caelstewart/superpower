@@ -5,9 +5,10 @@
 - Presentation hardening: generated copy must be the FIRST element of the
   agent's reply, set apart from commentary — enforced via server instructions,
   tool description, and a directive embedded in every generate_copy result
-- Generation prompt now includes the voice's thinking doc (signature moves and
-  structure are voice DNA; previously brainstorm-only, so e.g. a voice's
-  one-analogy-per-piece habit never reached generation)
+- Generation prompt is now identity + exemplars ONLY (blind ablation on the
+  catgpt voice: examples-only beat docs-in-prompt on all 3 briefs; checkable
+  rules are enforced by lint's post-generation revision pass; thinking and
+  guidelines serve brainstorming via get_voice_context)
 - Versioning policy: patch bumps for routine releases
 
 ## 0.2.0 — 2026-07-12

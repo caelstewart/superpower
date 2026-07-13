@@ -22,17 +22,14 @@ function specimenBrief(s: Specimen): string {
 }
 
 export function buildSystem(voice: Voice): string {
-  const parts = [voice.identity.trim()];
-  // The thinking doc (how this voice develops ideas: signature moves, structure,
-  // evidence habits) shapes generation, not just brainstorming — a voice's
-  // characteristic move is voice DNA even when no sampled exemplar carries it.
-  if (voice.thinking.trim()) {
-    parts.push(`How you think about and develop every piece:\n${voice.thinking.trim()}`);
-  }
-  if (voice.guidelines.trim()) {
-    parts.push(`Hard rules for everything you write:\n${voice.guidelines.trim()}`);
-  }
-  return parts.join("\n\n");
+  // Identity ONLY. Blind ablation (2026-07-13, catgpt voice, 3 briefs, single
+  // judge): examples-only beat identity+thinking+guidelines on every brief.
+  // Demonstrations carry the voice; checkable rules are enforced by the lint
+  // engine's post-generation revision pass; thinking/guidelines serve the
+  // brainstorming phase via get_voice_context. Do not add doc prose or style
+  // instructions here without re-running the ablation harness
+  // (voice-docs-ablation/) and winning.
+  return voice.identity.trim();
 }
 
 export function buildGenerationMessages(
