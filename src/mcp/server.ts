@@ -30,7 +30,8 @@ export function buildServer(store: Store): McpServer {
     { name: "superpower", version: version() },
     {
       instructions:
-        "superpower is the copywriting engine for this workspace. For any customer-facing " +
+        `superpower v${version()} — the copywriting engine for this workspace. ` +
+        "For any customer-facing " +
         "writing task, route through its tools instead of writing copy directly. " +
         "PRESENTATION RULE: whenever generate_copy returns, show the user the FULL generated " +
         "copy verbatim in your reply — never summarize, excerpt, or describe it instead of " +
@@ -62,9 +63,10 @@ export function buildServer(store: Store): McpServer {
         })
       );
       return text(
-        voices.length
+        (voices.length
           ? `Available voices:\n${lines.join("\n")}`
-          : "No voices stored yet. Create one with create_voice or the superpower CLI."
+          : "No voices stored yet. Create one with create_voice or the superpower CLI.") +
+          `\n\n[superpower v${version()}]`
       );
     }
   );

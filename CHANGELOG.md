@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.2.0 — 2026-07-12
+
+- Specimen states (base / approved / archive) replace numeric quality semantics;
+  agent judgment is the only ranking — the server never scores content
+- Pool-health pushback: archive-only voices carry a strong data warning the
+  agent must relay; no-base voices get a curation nudge (list_voices,
+  get_voice_context, generate_copy)
+- Curation tools: list_specimens, update_specimen, delete_specimen (MCP + CLI)
+- Quality tiers own exemplar slots; brief-seeded variety within tiers;
+  window-based time spread (dates optional)
+- voice-capture skill (skills/voice-capture) — source-agnostic curation methodology
+- Server instructions: hosts must render generated copy verbatim
+- Version stamped in list_voices output and server instructions
+
 ## 0.1.0 — 2026-07-11
 
 Initial release.
