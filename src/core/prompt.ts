@@ -22,13 +22,15 @@ function specimenBrief(s: Specimen): string {
 }
 
 export function buildSystem(voice: Voice): string {
-  // Identity ONLY. Blind ablation (2026-07-13, catgpt voice, 3 briefs, single
-  // judge): examples-only beat identity+thinking+guidelines on every brief.
-  // Demonstrations carry the voice; checkable rules are enforced by the lint
-  // engine's post-generation revision pass; thinking/guidelines serve the
-  // brainstorming phase via get_voice_context. Do not add doc prose or style
-  // instructions here without re-running the ablation harness
-  // (voice-docs-ablation/) and winning.
+  // Identity ONLY. Two blind ablation rounds (2026-07-13, catgpt voice, 6
+  // briefs total, single judge): bare identity+examples ranked top or tied in
+  // 5/6; the thinking doc was the isolated culprit — every arm containing it
+  // in the generation prompt lost (6/6); guidelines-in-prompt was a wash and
+  // is redundant with lint. Demonstrations carry the voice; checkable rules
+  // are enforced by the lint engine's post-generation revision pass; thinking/
+  // guidelines serve the brainstorming phase via get_voice_context. Do not add
+  // doc prose or style instructions here without re-running the ablation
+  // harness (voice-docs-ablation/) and winning.
   return voice.identity.trim();
 }
 
