@@ -35,7 +35,7 @@ const SPECIMENS = [
 const store = new SqliteStore(":memory:");
 const v = await store.createVoice({
   id: "t", name: "T", description: "d",
-  identity: "You are T.", thinking: "", guidelines: "No tables.",
+  identity: "You are T.", thinking: "Always one analogy per piece.", guidelines: "No tables.",
   default_type: "post",
 });
 for (let i = 0; i < 10; i++) {
@@ -110,6 +110,7 @@ check("select: filters content type", ex.every((s) => s.content_type === "post")
 const msgs = buildGenerationMessages(v, ex, "post", "Test brief");
 check("prompt: system first", msgs[0].role === "system");
 check("prompt: system carries guidelines", msgs[0].content.includes("No tables."));
+check("prompt: system carries thinking doc", msgs[0].content.includes("one analogy per piece"));
 check(
   "prompt: exemplars are user/assistant turn pairs",
   msgs.slice(1, -1).every((m, i) => m.role === (i % 2 === 0 ? "user" : "assistant"))

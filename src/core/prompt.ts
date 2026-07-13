@@ -23,6 +23,12 @@ function specimenBrief(s: Specimen): string {
 
 export function buildSystem(voice: Voice): string {
   const parts = [voice.identity.trim()];
+  // The thinking doc (how this voice develops ideas: signature moves, structure,
+  // evidence habits) shapes generation, not just brainstorming — a voice's
+  // characteristic move is voice DNA even when no sampled exemplar carries it.
+  if (voice.thinking.trim()) {
+    parts.push(`How you think about and develop every piece:\n${voice.thinking.trim()}`);
+  }
   if (voice.guidelines.trim()) {
     parts.push(`Hard rules for everything you write:\n${voice.guidelines.trim()}`);
   }

@@ -118,8 +118,10 @@ Read the killer set closely, then write:
   or by eye in 5 seconds, it's not a guideline, it's a vibe — cut it.
 - **thinking** (`update_voice`, field `thinking`): how this voice *develops
   ideas* — where topics come from, the characteristic move (reframe? teardown?
-  story-first?), what counts as evidence, how pieces open and close. This is
-  what brainstorming uses; write it from observation, not aspiration.
+  story-first?), what counts as evidence, how pieces open and close. Used in
+  BOTH phases: handed to the host agent for brainstorming AND included in the
+  server-side generation prompt. Write it from observation, not aspiration —
+  behaviors and structures, never style adjectives.
 - **lint rules** (`add_lint_rule`): every guideline that's mechanically
   checkable becomes one — banned strings/patterns, sentence caps. These
   auto-enforce with a revision pass on every generation.
