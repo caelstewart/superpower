@@ -110,7 +110,7 @@ export function buildServer(store: Store): McpServer {
         brief: z
           .string()
           .describe(
-            "specific brief: topic/title, the angle or core idea, key points to hit, audience. More specific = better output"
+            "specific brief: topic/title, the angle or core idea, key points to hit, audience — AND any research, facts, numbers, quotes, or source material the piece should draw on, pasted right into the brief. Generation only knows what you pass; ablation-tested: briefs without their supporting facts produce measurably weaker copy, while format (structured vs prose) makes no difference"
           ),
         content_type: z
           .string()
