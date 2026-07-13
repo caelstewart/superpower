@@ -145,9 +145,9 @@ await client.connect(transport);
 const tools = await client.listTools();
 const names = tools.tools.map((t) => t.name).sort();
 check(
-  "mcp: exposes 11 tools",
+  "mcp: exposes 12 tools",
   JSON.stringify(names) ===
-    JSON.stringify(["add_lint_rule", "create_voice", "critique_copy", "delete_specimen", "generate_copy", "get_voice_context", "list_specimens", "list_voices", "save_specimen", "update_specimen", "update_voice"]),
+    JSON.stringify(["add_lint_rule", "create_voice", "critique_copy", "delete_specimen", "generate_copy", "get_voice_context", "list_specimens", "list_voices", "revise_copy", "save_specimen", "update_specimen", "update_voice"]),
   names.join(",")
 );
 
@@ -260,6 +260,19 @@ if (process.env.SUPERPOWER_OPENAI_API_KEY || process.env.ANTHROPIC_API_KEY) {
   const words = out.split(/\s+/).length;
   check("live: generated >120 words", words > 120, `${words} words`);
   check("live: metadata footer present", out.includes("exemplars:"));
+  const draft = out.split("\n---\n")[0].trim();
+  const rev = await client.callTool({
+    name: "revise_copy",
+    arguments: {
+      voice: VOICE,
+      draft,
+      instructions: "Keep everything, but make the final paragraph mention a lighthouse keeper as the closing analogy.",
+    },
+  }, undefined, { timeout: 240000 });
+  const revOut = rev.content[0].text;
+  check("live: revision returns full piece", revOut.split(/\s+/).length > 100, `${revOut.split(/\s+/).length} words`);
+  check("live: revision applied the change", /lighthouse/i.test(revOut));
+  check("live: revision footer marks revision", revOut.includes("revision"));
   console.log("\n----- live sample (first 300 chars) -----\n" + out.slice(0, 300) + "\n-----------------------------------------");
 } else {
   console.log("SKIP  live generation (no provider creds in env)");

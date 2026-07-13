@@ -9,6 +9,11 @@
   catgpt voice: examples-only beat docs-in-prompt on all 3 briefs; checkable
   rules are enforced by lint's post-generation revision pass; thinking and
   guidelines serve brainstorming via get_voice_context)
+- revise_copy: in-voice iteration on existing drafts — agent passes the current
+  draft + change instructions, exemplars re-anchor the voice each cycle,
+  unlimited rounds; server instructions route all edit requests through it
+- generate_copy brief guidance: pass research/facts in the brief (round-3
+  ablation: fact-less briefs lost every topic; packaging made no difference)
 - Versioning policy: patch bumps for routine releases
 
 ## 0.2.0 — 2026-07-12

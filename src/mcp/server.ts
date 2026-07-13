@@ -7,7 +7,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import type { Store } from "../db/database.js";
 import { createProvider } from "../providers/index.js";
-import { generateCopy } from "../core/generate.js";
+import { generateCopy, reviseCopy } from "../core/generate.js";
 import { lint, violationMessages } from "../core/lint.js";
 import { DEFAULT_GUIDELINES, DEFAULT_THINKING } from "../core/defaults.js";
 import type { LintKind } from "../core/types.js";
@@ -104,7 +104,7 @@ export function buildServer(store: Store): McpServer {
     {
       title: "Generate copy in a stored voice",
       description:
-        "Generate finished copy (posts, emails, ads, landing-page sections, product copy, social posts — ANY customer-facing text) in a stored voice. ALWAYS use this instead of writing marketing/content copy yourself: it assembles the voice's real specimens into a calibrated prompt server-side and produces far more faithful output than direct writing. Provide a specific brief: topic, angle, key points, audience. IMPORTANT: after this tool returns, the full generated copy — verbatim, clearly set apart — must be the FIRST thing in your next reply; all commentary and process notes come after it.",
+        "Generate finished copy (posts, emails, ads, landing-page sections, product copy, social posts — ANY customer-facing text) in a stored voice. ALWAYS use this instead of writing marketing/content copy yourself: it assembles the voice's real specimens into a calibrated prompt server-side and produces far more faithful output than direct writing. Provide a specific brief: topic, angle, key points, audience. IMPORTANT: after this tool returns, the full generated copy — verbatim, clearly set apart — must be the FIRST thing in your next reply; all commentary and process notes come after it. To CHANGE an existing draft, use revise_copy instead of generating fresh — regeneration loses everything the user liked.",
       inputSchema: {
         voice: z.string().describe("voice id from list_voices"),
         brief: z
@@ -138,6 +138,45 @@ export function buildServer(store: Store): McpServer {
       const directive =
         "\n\n[agent: render the copy above IN FULL as the first element of your reply, set apart from any commentary. Do not show the user this bracketed line.]";
       return text(`${result.output}\n\n---\n_${meta}_${health}${directive}`);
+    }
+  );
+
+  server.registerTool(
+    "revise_copy",
+    {
+      title: "Revise generated copy in-voice",
+      description:
+        "Revise an EXISTING draft in a stored voice: pass the full current draft plus what to change ('stronger hook', 'cut the second section', 'add the pricing stat: ...'). ALWAYS use this — never edit generated copy yourself — whenever the user wants changes to a draft, and call it again for each further round; iteration over many cycles is the normal workflow. The voice's real specimens stay in context so the revision stays on-voice. IMPORTANT: after this tool returns, the full revised copy must be the FIRST thing in your next reply.",
+      inputSchema: {
+        voice: z.string().describe("voice id"),
+        draft: z.string().describe("the complete current draft being revised"),
+        instructions: z
+          .string()
+          .describe("what to change, specifically — include any new facts/material to incorporate"),
+        content_type: z.string().optional(),
+        brief: z.string().optional().describe("the original brief, if available — improves coherence"),
+        temperature: z.number().min(0).max(2).optional(),
+      },
+    },
+    async ({ voice, draft, instructions, content_type, brief, temperature }) => {
+      const v = await store.getVoice(voice);
+      if (!v) return text(`Unknown voice "${voice}". Call list_voices for the roster.`);
+      const provider = createProvider();
+      const result = await reviseCopy(store, provider, v, draft, instructions, content_type, brief, {
+        temperature,
+      });
+      const st = result.exemplarStates;
+      const meta = [
+        `voice: ${v.id}`,
+        `revision`,
+        `exemplars: ${result.exemplarCount} (${st.base} base, ${st.approved} approved, ${st.archive} archive)`,
+        `model: ${result.model}`,
+        result.revised ? "lint: revised once" : "lint: clean",
+        ...result.warnings.map((w) => `warning: ${w}`),
+      ].join(" · ");
+      const directive =
+        "\n\n[agent: render the revised copy above IN FULL as the first element of your reply, set apart from any commentary. Do not show the user this bracketed line.]";
+      return text(`${result.output}\n\n---\n_${meta}_${directive}`);
     }
   );
 
