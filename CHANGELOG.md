@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.1 — 2026-07-12 (staged, not yet deployed)
+
+- Presentation hardening: generated copy must be the FIRST element of the
+  agent's reply, set apart from commentary — enforced via server instructions,
+  tool description, and a directive embedded in every generate_copy result
+- Versioning policy: patch bumps for routine releases
+
 ## 0.2.0 — 2026-07-12
 
 - Specimen states (base / approved / archive) replace numeric quality semantics;
