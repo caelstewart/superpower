@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.2.2 — 2026-07-14
+
+- Customer portal at / (terminal CRT design): email signup mints a working
+  sp_live_ API key, key-based dashboard with billing panel, per-host install
+  snippets, signup rate limiting
+- Accounts table (both adapters); MCP auth accepts operator env keys OR
+  account keys from the db; auth now always required on /mcp
+- Billing v0: Stripe Payment Link + Customer Portal via STRIPE_PAYMENT_LINK /
+  STRIPE_PORTAL_LINK env; `superpower account list|set-status` CLI until
+  webhooks land
+
 ## 0.2.1 — 2026-07-12 (staged, not yet deployed)
 
 - Presentation hardening: generated copy must be the FIRST element of the

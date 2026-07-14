@@ -8,7 +8,7 @@ import { readFileSync, mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { homedir } from "node:os";
-import type { Voice, Specimen, LintRule } from "../core/types.js";
+import type { Voice, Specimen, LintRule, Account } from "../core/types.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -46,6 +46,11 @@ export interface Store {
   addLintRule(r: Omit<LintRule, "id" | "created_at">): Promise<LintRule>;
   listLintRules(voiceId: string): Promise<LintRule[]>;
   logGeneration(g: GenerationLog): Promise<void>;
+  createAccount(email: string, apiKey: string): Promise<Account>;
+  getAccountByKey(apiKey: string): Promise<Account | null>;
+  getAccountByEmail(email: string): Promise<Account | null>;
+  listAccounts(): Promise<Account[]>;
+  setAccountStatus(email: string, plan: string, stripeStatus: string): Promise<Account | null>;
   close(): Promise<void>;
 }
 
@@ -206,6 +211,34 @@ export class SqliteStore implements Store {
         g.voice_id, g.content_type, g.brief, g.output, g.provider, g.model,
         g.exemplar_count, g.lint_failures, g.revised, g.duration_ms, now()
       );
+  }
+
+  async createAccount(email: string, apiKey: string): Promise<Account> {
+    this.db
+      .prepare("INSERT INTO accounts (email, api_key, created_at) VALUES (?, ?, ?)")
+      .run(email.toLowerCase().trim(), apiKey, now());
+    return (await this.getAccountByEmail(email))!;
+  }
+
+  async getAccountByKey(apiKey: string): Promise<Account | null> {
+    return (this.db.prepare("SELECT * FROM accounts WHERE api_key = ?").get(apiKey) as unknown as Account) ?? null;
+  }
+
+  async getAccountByEmail(email: string): Promise<Account | null> {
+    return (this.db
+      .prepare("SELECT * FROM accounts WHERE email = ?")
+      .get(email.toLowerCase().trim()) as unknown as Account) ?? null;
+  }
+
+  async listAccounts(): Promise<Account[]> {
+    return this.db.prepare("SELECT * FROM accounts ORDER BY created_at").all() as unknown as Account[];
+  }
+
+  async setAccountStatus(email: string, plan: string, stripeStatus: string): Promise<Account | null> {
+    this.db
+      .prepare("UPDATE accounts SET plan = ?, stripe_status = ? WHERE email = ?")
+      .run(plan, stripeStatus, email.toLowerCase().trim());
+    return this.getAccountByEmail(email);
   }
 
   async close(): Promise<void> {

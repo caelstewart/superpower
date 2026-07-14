@@ -54,3 +54,13 @@ CREATE TABLE IF NOT EXISTS generations (
   duration_ms    INTEGER NOT NULL DEFAULT 0,
   created_at     TEXT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS accounts (
+  id             INTEGER PRIMARY KEY AUTOINCREMENT,  -- SERIAL on Postgres
+  email          TEXT NOT NULL UNIQUE,
+  api_key        TEXT NOT NULL UNIQUE,
+  plan           TEXT NOT NULL DEFAULT 'trial',      -- trial | pro
+  stripe_status  TEXT NOT NULL DEFAULT 'none',       -- none | active | past_due | canceled
+  created_at     TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_accounts_key ON accounts(api_key);

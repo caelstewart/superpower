@@ -256,6 +256,29 @@ program
     }
   });
 
+const account = program.command("account").description("manage customer accounts");
+
+account
+  .command("list")
+  .description("list accounts")
+  .action(async () => {
+    const store = await createStore();
+    for (const a of await store.listAccounts()) {
+      console.log(`${a.email}\t${a.plan}\t${a.stripe_status}\t${a.api_key.slice(0, 11)}…\t${a.created_at.slice(0, 10)}`);
+    }
+    await store.close();
+  });
+
+account
+  .command("set-status <email> <plan> <stripeStatus>")
+  .description("set plan + stripe status (e.g. pro active) — manual until Stripe webhooks land")
+  .action(async (email, plan, stripeStatus) => {
+    const store = await createStore();
+    const a = await store.setAccountStatus(email, plan, stripeStatus);
+    console.log(a ? `${a.email} → plan=${a.plan} stripe=${a.stripe_status}` : `no account: ${email}`);
+    await store.close();
+  });
+
 program
   .command("doctor")
   .description("check environment")

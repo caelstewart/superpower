@@ -166,6 +166,14 @@ rules snippet makes routing all copywriting through superpower deterministic.
 Run one server next to a Postgres database; every client connects with a URL and a
 bearer key. Nothing is installed client-side.
 
+The same server ships a terminal-styled customer portal at `/`: email signup
+mints a working `sp_live_` API key (rate-limited), and the key doubles as the
+dashboard login — account info, billing status, and per-tool install snippets.
+Billing v0 uses Stripe no-code links: set `STRIPE_PAYMENT_LINK` (checkout) and
+`STRIPE_PORTAL_LINK` (manage billing); activate subscriptions with
+`superpower account set-status <email> pro active` until webhook integration
+lands. MCP auth accepts operator keys (`SUPERPOWER_API_KEYS`) and account keys.
+
 ```bash
 export DATABASE_URL="postgresql://...?sslmode=verify-full"   # Neon, Supabase, RDS…
 export SUPERPOWER_API_KEYS="key-for-client-a,key-for-client-b"

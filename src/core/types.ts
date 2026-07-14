@@ -61,3 +61,12 @@ export interface GenerationResult {
   durationMs: number;
   warnings: string[];
 }
+
+export interface Account {
+  id: number;
+  email: string;
+  api_key: string;
+  plan: string;
+  stripe_status: string;
+  created_at: string;
+}

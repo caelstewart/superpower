@@ -4,7 +4,7 @@
  * Connection: SUPERPOWER_DATABASE_URL or DATABASE_URL.
  */
 import pg from "pg";
-import type { Voice, Specimen, LintRule } from "../core/types.js";
+import type { Voice, Specimen, LintRule, Account } from "../core/types.js";
 import type { GenerationLog, Store } from "./database.js";
 import { schemaSql } from "./database.js";
 
@@ -173,6 +173,32 @@ export class PgStore implements Store {
         g.exemplar_count, g.lint_failures, g.revised, g.duration_ms, now(),
       ]
     );
+  }
+
+  async createAccount(email: string, apiKey: string): Promise<Account> {
+    const row = await this.one<Account>(
+      "INSERT INTO accounts (email, api_key, created_at) VALUES ($1, $2, $3) RETURNING *",
+      [email.toLowerCase().trim(), apiKey, now()]
+    );
+    return row!;
+  }
+
+  async getAccountByKey(apiKey: string): Promise<Account | null> {
+    return this.one<Account>("SELECT * FROM accounts WHERE api_key = $1", [apiKey]);
+  }
+
+  async getAccountByEmail(email: string): Promise<Account | null> {
+    return this.one<Account>("SELECT * FROM accounts WHERE email = $1", [email.toLowerCase().trim()]);
+  }
+
+  async listAccounts(): Promise<Account[]> {
+    return this.all<Account>("SELECT * FROM accounts ORDER BY created_at");
+  }
+
+  async setAccountStatus(email: string, plan: string, stripeStatus: string): Promise<Account | null> {
+    await this.pool.query("UPDATE accounts SET plan = $1, stripe_status = $2 WHERE email = $3",
+      [plan, stripeStatus, email.toLowerCase().trim()]);
+    return this.getAccountByEmail(email);
   }
 
   async close(): Promise<void> {
