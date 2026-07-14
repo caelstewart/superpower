@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.5 — 2026-07-14
+
+- ./resend_link button on the check-your-email page + spam/promotions hint
+
 ## 0.2.4 — 2026-07-14
 
 - Real login: email magic links via Resend (superpower@emails.mergelabs.co) —

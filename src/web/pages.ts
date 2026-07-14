@@ -145,7 +145,11 @@ export function checkEmailPage(email: string, devLink?: string): string {
   <h2>check_your_email</h2>
   <p class="line out">one-time link sent to <b>${esc(email)}</b> <span class="cursor"></span></p>
   <p class="line dim">// expires in 30 minutes. new emails get an account; existing ones get logged straight in.</p>
-  <p class="line dim">// nothing arrives? check spam for superpower@emails.mergelabs.co</p>
+  <p class="line dim">// nothing after a minute? check SPAM and the promotions tab for superpower@emails.mergelabs.co — or resend:</p>
+  <form class="term" method="POST" action="/signup">
+    <input type="hidden" name="email" value="${esc(email)}">
+    <button type="submit">./resend_link</button>
+  </form>
   ${devLink ? `<p class="line warn">! dev mode (no email provider) — <a href="${esc(devLink)}">./authenticate</a></p><!-- dev-link: ${esc(devLink)} -->` : ""}
 </section>`);
 }
