@@ -182,7 +182,7 @@ export async function serveHttp(port: number): Promise<void> {
         const email = readSession(req.headers.cookie);
         const account = email ? await store.getAccountByEmail(email) : null;
         if (account) {
-          html(res, dashboardPage(account, baseUrl(req), billing));
+          html(res, dashboardPage(account, baseUrl(req), billing, url.searchParams.get("rotated") === "1"));
           return;
         }
         html(res, dashboardLoginPage());
@@ -212,8 +212,8 @@ export async function serveHttp(port: number): Promise<void> {
           return;
         }
         const newKey = `sp_live_${randomBytes(24).toString("hex")}`;
-        const updated = await store.rotateAccountKey(account.email, newKey);
-        html(res, keyIssuedPage(updated!, baseUrl(req), false));
+        await store.rotateAccountKey(account.email, newKey);
+        res.writeHead(303, { location: "/dashboard?rotated=1" }).end();
         return;
       }
 

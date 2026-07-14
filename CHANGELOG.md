@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.6 — 2026-07-14
+
+- Plan price $49→$20/mo
+- Dashboard shows the full API key inline (behind session) + real key baked
+  into the copy-paste connect examples
+- Rotate key now redirects back to the dashboard with a confirmation banner and
+  the new key visible in place (was: silent when session was stale)
+
 ## 0.2.5 — 2026-07-14
 
 - ./resend_link button on the check-your-email page + spam/promotions hint

@@ -207,37 +207,43 @@ export interface BillingLinks {
   portalLink?: string;
 }
 
-export function dashboardPage(account: Account, host: string, billing: BillingLinks): string {
-  const masked = account.api_key.slice(0, 11) + "…" + account.api_key.slice(-4);
+export function dashboardPage(account: Account, host: string, billing: BillingLinks, rotated = false): string {
+  const key = account.api_key;
   const statusClass = `status-${account.stripe_status}`;
-  const keyField = `<input type="hidden" name="key" value="${esc(account.api_key)}">`;
   const billingBody =
     account.stripe_status === "active"
-      ? `<p class="line out">subscription <span class="status-active">ACTIVE</span> — plan: ${esc(account.plan)} ($49/mo)</p>
+      ? `<p class="line out">subscription <span class="status-active">ACTIVE</span> — plan: ${esc(account.plan)} ($20/mo)</p>
          ${
            billing.stripeEnabled
-             ? `<form class="term" method="POST" action="/billing/portal">${keyField}<button type="submit">./manage_billing</button><span class="dim"># invoices, payment method, cancel — via stripe</span></form>`
+             ? `<form class="term" method="POST" action="/billing/portal"><button type="submit">./manage_billing</button><span class="dim"># invoices, payment method, cancel — via stripe</span></form>`
              : ""
          }`
       : `<p class="line out">status: <span class="${statusClass}">${esc(account.stripe_status.toUpperCase())}</span> — plan: ${esc(account.plan)}</p>
          ${
            billing.stripeEnabled
-             ? `<form class="term" method="POST" action="/billing/checkout">${keyField}<button type="submit">./activate_subscription --price 49/mo</button><span class="dim"># secure checkout via stripe</span></form>
+             ? `<form class="term" method="POST" action="/billing/checkout"><button type="submit">./activate_subscription --price 20/mo</button><span class="dim"># secure checkout via stripe</span></form>
                 <p class="line dim">// activation is automatic within seconds of checkout completing.</p>`
              : `<p class="line warn">! billing not yet enabled on this deployment — your trial key works without limits for now.</p>`
          }`;
   return shell("superpower — dashboard", `
 <pre class="banner">${BANNER}</pre>
 <p class="line out">authenticated as <b>${esc(account.email)}</b> <span class="cursor"></span></p>
+${rotated ? `<p class="line warn">! key rotated — the previous key is now dead. update your tools with the new key below.</p>` : ""}
 
 <section class="panel">
   <h2>account</h2>
   <table>
     <tr><td>email</td><td>${esc(account.email)}</td></tr>
-    <tr><td>api_key</td><td>${esc(masked)} <span class="dim"># lost it? ./rotate_api_key below issues a fresh one</span></td></tr>
     <tr><td>plan</td><td>${esc(account.plan)}</td></tr>
     <tr><td>member_since</td><td>${esc(account.created_at.slice(0, 10))}</td></tr>
   </table>
+</section>
+
+<section class="panel">
+  <h2>api_key</h2>
+  <p class="line dim">// your full key — visible only on your authenticated dashboard. treat it like a password.</p>
+  <code class="block" id="apikey">${esc(key)}</code>
+  <button class="copybtn" onclick="cp('apikey', this)">copy</button>
 </section>
 
 <section class="panel">
@@ -247,19 +253,21 @@ export function dashboardPage(account: Account, host: string, billing: BillingLi
 
 <section class="panel">
   <h2>connect_your_tools</h2>
-  <p class="line dim">// claude code:</p>
+  <p class="line dim">// claude code — paste this whole line (your real key is already in it):</p>
   <code class="block" id="cc">claude mcp add --transport http superpower ${esc(host)}/mcp \\
-  --header "Authorization: Bearer &lt;your api key&gt;"</code>
+  --header "Authorization: Bearer ${esc(key)}"</code>
+  <button class="copybtn" onclick="cp('cc', this)">copy</button>
   <p class="line dim">// cursor (~/.cursor/mcp.json):</p>
   <code class="block" id="cu">{ "mcpServers": { "superpower": {
     "url": "${esc(host)}/mcp",
-    "headers": { "Authorization": "Bearer &lt;your api key&gt;" } } } }</code>
+    "headers": { "Authorization": "Bearer ${esc(key)}" } } } }</code>
+  <button class="copybtn" onclick="cp('cu', this)">copy</button>
 </section>
 
 <section class="panel">
   <h2>account_actions</h2>
   <form class="term" method="POST" action="/account/rotate" onsubmit="return confirm('Rotate key? The current key stops working immediately — every connected tool must be updated.')">
-    <button type="submit">./rotate_api_key</button><span class="dim"># invalidates the old key instantly</span>
+    <button type="submit">./rotate_api_key</button><span class="dim"># invalidates the old key instantly, then shows the new one here</span>
   </form>
   <form class="term" method="POST" action="/logout">
     <button type="submit">./logout</button>
