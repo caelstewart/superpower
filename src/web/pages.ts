@@ -117,30 +117,43 @@ export function landingPage(error?: string): string {
 </section>
 
 <section class="panel">
-  <h2>signup</h2>
-  <p class="line dim">// one email. you get an api key on the next screen — that key is your account.</p>
+  <h2>signup_or_login</h2>
+  <p class="line dim">// one email, one magic link. new emails get an account; existing ones get logged in (and can recover a lost key).</p>
   ${error ? `<p class="line err">! ${esc(error)}</p>` : ""}
   <form class="term" method="POST" action="/signup">
     <label for="email">email:</label>
     <input type="email" id="email" name="email" required placeholder="you@company.com" autocomplete="email">
-    <button type="submit">./signup --start</button>
+    <button type="submit">./authenticate --send-link</button>
   </form>
 </section>
 
 <section class="panel">
-  <h2>already_have_a_key</h2>
+  <h2>login_with_api_key</h2>
+  <p class="line dim">// fallback for API-first users.</p>
   <form class="term" method="POST" action="/dashboard">
     <label for="key">api_key:</label>
     <input type="password" id="key" name="key" required placeholder="sp_live_…" autocomplete="off">
-    <button type="submit">./login</button>
+    <button type="submit">./login --key</button>
   </form>
 </section>`);
 }
 
-export function keyIssuedPage(account: Account, host: string): string {
-  return shell("superpower — key issued", `
+export function checkEmailPage(email: string, devLink?: string): string {
+  return shell("superpower — check your email", `
 <pre class="banner">${BANNER}</pre>
-<p class="line out">account created for <b>${esc(account.email)}</b></p>
+<section class="panel">
+  <h2>check_your_email</h2>
+  <p class="line out">one-time link sent to <b>${esc(email)}</b> <span class="cursor"></span></p>
+  <p class="line dim">// expires in 30 minutes. new emails get an account; existing ones get logged straight in.</p>
+  <p class="line dim">// nothing arrives? check spam for superpower@emails.mergelabs.co</p>
+  ${devLink ? `<p class="line warn">! dev mode (no email provider) — <a href="${esc(devLink)}">./authenticate</a></p><!-- dev-link: ${esc(devLink)} -->` : ""}
+</section>`);
+}
+
+export function keyIssuedPage(account: Account, host: string, isNew: boolean): string {
+  return shell(isNew ? "superpower — key issued" : "superpower — key rotated", `
+<pre class="banner">${BANNER}</pre>
+<p class="line out">${isNew ? `account created for <b>${esc(account.email)}</b> — email verified` : `key ROTATED for <b>${esc(account.email)}</b> — the old key is dead; update your tools`}</p>
 
 <section class="panel">
   <h2>your_api_key</h2>
@@ -217,7 +230,7 @@ export function dashboardPage(account: Account, host: string, billing: BillingLi
   <h2>account</h2>
   <table>
     <tr><td>email</td><td>${esc(account.email)}</td></tr>
-    <tr><td>api_key</td><td>${esc(masked)} <span class="dim"># full key shown only at signup</span></td></tr>
+    <tr><td>api_key</td><td>${esc(masked)} <span class="dim"># lost it? ./rotate_api_key below issues a fresh one</span></td></tr>
     <tr><td>plan</td><td>${esc(account.plan)}</td></tr>
     <tr><td>member_since</td><td>${esc(account.created_at.slice(0, 10))}</td></tr>
   </table>
@@ -239,5 +252,13 @@ export function dashboardPage(account: Account, host: string, billing: BillingLi
     "headers": { "Authorization": "Bearer &lt;your api key&gt;" } } } }</code>
 </section>
 
-<p class="line prompt"><a href="/">./logout</a></p>`);
+<section class="panel">
+  <h2>account_actions</h2>
+  <form class="term" method="POST" action="/account/rotate" onsubmit="return confirm('Rotate key? The current key stops working immediately — every connected tool must be updated.')">
+    <button type="submit">./rotate_api_key</button><span class="dim"># invalidates the old key instantly</span>
+  </form>
+  <form class="term" method="POST" action="/logout">
+    <button type="submit">./logout</button>
+  </form>
+</section>`);
 }

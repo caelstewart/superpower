@@ -65,3 +65,13 @@ CREATE TABLE IF NOT EXISTS accounts (
   created_at     TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_accounts_key ON accounts(api_key);
+
+CREATE TABLE IF NOT EXISTS login_tokens (
+  token          TEXT PRIMARY KEY,
+  email          TEXT NOT NULL,
+  purpose        TEXT NOT NULL,                      -- signup | login
+  expires_at     TEXT NOT NULL,
+  used           INTEGER NOT NULL DEFAULT 0,
+  created_at     TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_login_tokens_email ON login_tokens(email);

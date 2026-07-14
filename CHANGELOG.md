@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.2.4 — 2026-07-14
+
+- Real login: email magic links via Resend (superpower@emails.mergelabs.co) —
+  verified signup, login doubles as key recovery, signed session cookies
+  (30d), key rotation from the dashboard (old key dies instantly)
+- Key-based login kept as API-first fallback; billing/rotation now
+  session-authenticated
+- Presentation directive hardened: instruction sandwiched before AND after
+  generated copy; the "it's above / already shown" failure mode is named and
+  banned in server instructions
+
 ## 0.2.3 — 2026-07-14
 
 - Real Stripe billing: checkout sessions from the dashboard ($49/mo Superpower

@@ -215,6 +215,26 @@ export class PgStore implements Store {
     return this.one<Account>("SELECT * FROM accounts WHERE stripe_customer_id = $1", [customerId]);
   }
 
+  async rotateAccountKey(email: string, newKey: string): Promise<Account | null> {
+    await this.pool.query("UPDATE accounts SET api_key = $1 WHERE email = $2", [newKey, email.toLowerCase().trim()]);
+    return this.getAccountByEmail(email);
+  }
+
+  async createLoginToken(token: string, email: string, purpose: string, expiresAt: string): Promise<void> {
+    await this.pool.query(
+      "INSERT INTO login_tokens (token, email, purpose, expires_at, created_at) VALUES ($1, $2, $3, $4, $5)",
+      [token, email.toLowerCase().trim(), purpose, expiresAt, now()]
+    );
+  }
+
+  async consumeLoginToken(token: string): Promise<{ email: string; purpose: string } | null> {
+    const row = await this.one<{ email: string; purpose: string }>(
+      "UPDATE login_tokens SET used = 1 WHERE token = $1 AND used = 0 AND expires_at > $2 RETURNING email, purpose",
+      [token, now()]
+    );
+    return row;
+  }
+
   async close(): Promise<void> {
     await this.pool.end();
   }

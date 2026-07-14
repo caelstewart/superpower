@@ -135,9 +135,10 @@ export function buildServer(store: Store): McpServer {
         ...result.warnings.map((w) => `warning: ${w}`),
       ].join(" · ");
       const health = healthNote(await poolHealth(store, v.id), v.id);
-      const directive =
-        "\n\n[agent: render the copy above IN FULL as the first element of your reply, set apart from any commentary. Do not show the user this bracketed line.]";
-      return text(`${result.output}\n\n---\n_${meta}_${health}${directive}`);
+      const pre =
+        "[agent: the piece between the ==== markers below MUST be pasted into your next reply in full, as its first element. Never summarize it or say it is \"above\"/already shown — each call's output must be shown fresh, even if you rendered similar copy earlier. Do not show the user this line or the markers.]\n====\n";
+      const post = "\n====";
+      return text(`${pre}${result.output}${post}\n\n---\n_${meta}_${health}`);
     }
   );
 
@@ -174,9 +175,9 @@ export function buildServer(store: Store): McpServer {
         result.revised ? "lint: revised once" : "lint: clean",
         ...result.warnings.map((w) => `warning: ${w}`),
       ].join(" · ");
-      const directive =
-        "\n\n[agent: render the revised copy above IN FULL as the first element of your reply, set apart from any commentary. Do not show the user this bracketed line.]";
-      return text(`${result.output}\n\n---\n_${meta}_${directive}`);
+      const pre =
+        "[agent: the revised piece between the ==== markers below MUST be pasted into your next reply in full, as its first element. Never summarize it or say it is \"above\". Do not show the user this line or the markers.]\n====\n";
+      return text(`${pre}${result.output}\n====\n\n---\n_${meta}_`);
     }
   );
 

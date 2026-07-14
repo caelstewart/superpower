@@ -53,6 +53,9 @@ export interface Store {
   setAccountStatus(email: string, plan: string, stripeStatus: string): Promise<Account | null>;
   setAccountStripe(email: string, customerId: string, plan: string, stripeStatus: string): Promise<Account | null>;
   getAccountByStripeCustomer(customerId: string): Promise<Account | null>;
+  rotateAccountKey(email: string, newKey: string): Promise<Account | null>;
+  createLoginToken(token: string, email: string, purpose: string, expiresAt: string): Promise<void>;
+  consumeLoginToken(token: string): Promise<{ email: string; purpose: string } | null>;
   close(): Promise<void>;
 }
 
@@ -259,6 +262,26 @@ export class SqliteStore implements Store {
     return (this.db
       .prepare("SELECT * FROM accounts WHERE stripe_customer_id = ?")
       .get(customerId) as unknown as Account) ?? null;
+  }
+
+  async rotateAccountKey(email: string, newKey: string): Promise<Account | null> {
+    this.db.prepare("UPDATE accounts SET api_key = ? WHERE email = ?").run(newKey, email.toLowerCase().trim());
+    return this.getAccountByEmail(email);
+  }
+
+  async createLoginToken(token: string, email: string, purpose: string, expiresAt: string): Promise<void> {
+    this.db
+      .prepare("INSERT INTO login_tokens (token, email, purpose, expires_at, created_at) VALUES (?, ?, ?, ?, ?)")
+      .run(token, email.toLowerCase().trim(), purpose, expiresAt, now());
+  }
+
+  async consumeLoginToken(token: string): Promise<{ email: string; purpose: string } | null> {
+    const row = this.db
+      .prepare("SELECT * FROM login_tokens WHERE token = ? AND used = 0 AND expires_at > ?")
+      .get(token, now()) as { email: string; purpose: string } | undefined;
+    if (!row) return null;
+    this.db.prepare("UPDATE login_tokens SET used = 1 WHERE token = ?").run(token);
+    return { email: row.email, purpose: row.purpose };
   }
 
   async close(): Promise<void> {
