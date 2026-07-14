@@ -68,5 +68,6 @@ export interface Account {
   api_key: string;
   plan: string;
   stripe_status: string;
+  stripe_customer_id: string;
   created_at: string;
 }

@@ -28,6 +28,7 @@ export class PgStore implements Store {
     const pool = new pg.Pool({ connectionString: url, max: 5 });
     const store = new PgStore(pool);
     await pool.query(pgSchema());
+    await pool.query("ALTER TABLE accounts ADD COLUMN IF NOT EXISTS stripe_customer_id TEXT NOT NULL DEFAULT ''");
     return store;
   }
 
@@ -199,6 +200,19 @@ export class PgStore implements Store {
     await this.pool.query("UPDATE accounts SET plan = $1, stripe_status = $2 WHERE email = $3",
       [plan, stripeStatus, email.toLowerCase().trim()]);
     return this.getAccountByEmail(email);
+  }
+
+  async setAccountStripe(email: string, customerId: string, plan: string, stripeStatus: string): Promise<Account | null> {
+    await this.pool.query(
+      "UPDATE accounts SET stripe_customer_id = $1, plan = $2, stripe_status = $3 WHERE email = $4",
+      [customerId, plan, stripeStatus, email.toLowerCase().trim()]
+    );
+    return this.getAccountByEmail(email);
+  }
+
+  async getAccountByStripeCustomer(customerId: string): Promise<Account | null> {
+    if (!customerId) return null;
+    return this.one<Account>("SELECT * FROM accounts WHERE stripe_customer_id = $1", [customerId]);
   }
 
   async close(): Promise<void> {

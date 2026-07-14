@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.3 — 2026-07-14
+
+- Real Stripe billing: checkout sessions from the dashboard ($49/mo Superpower
+  Pro), customer portal, signature-verified webhooks auto-flipping account
+  status (checkout → active/pro; cancellation → key refused on /mcp)
+- stripe_customer_id on accounts (migrated on both backends)
+- Resend key wired for the upcoming email-verification milestone
+
 ## 0.2.2 — 2026-07-14
 
 - Customer portal at / (terminal CRT design): email signup mints a working

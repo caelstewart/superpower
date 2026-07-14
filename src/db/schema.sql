@@ -61,6 +61,7 @@ CREATE TABLE IF NOT EXISTS accounts (
   api_key        TEXT NOT NULL UNIQUE,
   plan           TEXT NOT NULL DEFAULT 'trial',      -- trial | pro
   stripe_status  TEXT NOT NULL DEFAULT 'none',       -- none | active | past_due | canceled
+  stripe_customer_id TEXT NOT NULL DEFAULT '',
   created_at     TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_accounts_key ON accounts(api_key);

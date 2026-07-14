@@ -10,6 +10,8 @@ import { SqliteStore, createStore } from "../dist/db/database.js";
 import { buildGenerationMessages } from "../dist/core/prompt.js";
 import { selectExemplars } from "../dist/core/select.js";
 import { lint } from "../dist/core/lint.js";
+import { verifyWebhookSignature, interpretEvent } from "../dist/billing/stripe.js";
+import { createHmac } from "node:crypto";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 
@@ -127,6 +129,24 @@ const rules = await store.listLintRules("t");
 check("lint: catches table", lint("a\n| a | b |\nrest", rules).length === 1);
 check("lint: catches banned string case-insensitively", lint("we Delve deep", rules).length === 1);
 check("lint: clean text passes", lint("plain prose only", rules).length === 0);
+
+// ---------- billing: webhook signature + event interpretation ----------
+{
+  const secret = "whsec_test_secret";
+  const payload = JSON.stringify({ type: "checkout.session.completed", data: { object: { client_reference_id: "a@b.com", customer: "cus_1" } } });
+  const t = Math.floor(Date.now() / 1000);
+  const sig = createHmac("sha256", secret).update(`${t}.${payload}`).digest("hex");
+  check("stripe: valid signature accepted", verifyWebhookSignature(payload, `t=${t},v1=${sig}`, secret));
+  check("stripe: wrong signature rejected", !verifyWebhookSignature(payload, `t=${t},v1=${"0".repeat(64)}`, secret));
+  check("stripe: stale timestamp rejected", !verifyWebhookSignature(payload, `t=${t - 4000},v1=${createHmac("sha256", secret).update(`${t - 4000}.${payload}`).digest("hex")}`, secret));
+  check("stripe: missing header rejected", !verifyWebhookSignature(payload, undefined, secret));
+  const o1 = interpretEvent(JSON.parse(payload));
+  check("stripe: checkout event → active", o1.status === "active" && o1.email === "a@b.com" && o1.customerId === "cus_1");
+  const o2 = interpretEvent({ type: "customer.subscription.deleted", data: { object: { customer: "cus_1" } } });
+  check("stripe: deletion event → canceled", o2.status === "canceled" && o2.customerId === "cus_1");
+  const o3 = interpretEvent({ type: "customer.subscription.updated", data: { object: { customer: "cus_1", status: "past_due" } } });
+  check("stripe: past_due mapped", o3.status === "past_due");
+}
 
 // ---------- MCP stdio round-trip on the configured backend ----------
 {

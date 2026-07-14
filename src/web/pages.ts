@@ -185,6 +185,7 @@ export function dashboardLoginPage(error?: string): string {
 }
 
 export interface BillingLinks {
+  stripeEnabled?: boolean;
   paymentLink?: string;
   portalLink?: string;
 }
@@ -192,15 +193,20 @@ export interface BillingLinks {
 export function dashboardPage(account: Account, host: string, billing: BillingLinks): string {
   const masked = account.api_key.slice(0, 11) + "…" + account.api_key.slice(-4);
   const statusClass = `status-${account.stripe_status}`;
+  const keyField = `<input type="hidden" name="key" value="${esc(account.api_key)}">`;
   const billingBody =
     account.stripe_status === "active"
-      ? `<p class="line out">subscription <span class="status-active">ACTIVE</span> — plan: ${esc(account.plan)}</p>
-         ${billing.portalLink ? `<p class="line prompt"><a href="${esc(billing.portalLink)}">./manage_billing</a> <span class="dim"># invoices, payment method, cancel — via stripe</span></p>` : ""}`
+      ? `<p class="line out">subscription <span class="status-active">ACTIVE</span> — plan: ${esc(account.plan)} ($49/mo)</p>
+         ${
+           billing.stripeEnabled
+             ? `<form class="term" method="POST" action="/billing/portal">${keyField}<button type="submit">./manage_billing</button><span class="dim"># invoices, payment method, cancel — via stripe</span></form>`
+             : ""
+         }`
       : `<p class="line out">status: <span class="${statusClass}">${esc(account.stripe_status.toUpperCase())}</span> — plan: ${esc(account.plan)}</p>
          ${
-           billing.paymentLink
-             ? `<p class="line prompt"><a href="${esc(billing.paymentLink)}?prefilled_email=${encodeURIComponent(account.email)}">./activate_subscription</a> <span class="dim"># secure checkout via stripe</span></p>
-                <p class="line dim">// after checkout, activation lands on your account within a minute.</p>`
+           billing.stripeEnabled
+             ? `<form class="term" method="POST" action="/billing/checkout">${keyField}<button type="submit">./activate_subscription --price 49/mo</button><span class="dim"># secure checkout via stripe</span></form>
+                <p class="line dim">// activation is automatic within seconds of checkout completing.</p>`
              : `<p class="line warn">! billing not yet enabled on this deployment — your trial key works without limits for now.</p>`
          }`;
   return shell("superpower — dashboard", `

@@ -51,6 +51,8 @@ export interface Store {
   getAccountByEmail(email: string): Promise<Account | null>;
   listAccounts(): Promise<Account[]>;
   setAccountStatus(email: string, plan: string, stripeStatus: string): Promise<Account | null>;
+  setAccountStripe(email: string, customerId: string, plan: string, stripeStatus: string): Promise<Account | null>;
+  getAccountByStripeCustomer(customerId: string): Promise<Account | null>;
   close(): Promise<void>;
 }
 
@@ -72,6 +74,10 @@ export class SqliteStore implements Store {
     this.db = new DatabaseSync(path);
     this.db.exec("PRAGMA journal_mode = WAL; PRAGMA foreign_keys = ON;");
     this.db.exec(schemaSql());
+    // migration for pre-0.2.3 dbs (sqlite has no ADD COLUMN IF NOT EXISTS)
+    try {
+      this.db.exec("ALTER TABLE accounts ADD COLUMN stripe_customer_id TEXT NOT NULL DEFAULT ''");
+    } catch { /* column exists */ }
   }
 
   async createVoice(v: Omit<Voice, "created_at" | "updated_at">): Promise<Voice> {
@@ -239,6 +245,20 @@ export class SqliteStore implements Store {
       .prepare("UPDATE accounts SET plan = ?, stripe_status = ? WHERE email = ?")
       .run(plan, stripeStatus, email.toLowerCase().trim());
     return this.getAccountByEmail(email);
+  }
+
+  async setAccountStripe(email: string, customerId: string, plan: string, stripeStatus: string): Promise<Account | null> {
+    this.db
+      .prepare("UPDATE accounts SET stripe_customer_id = ?, plan = ?, stripe_status = ? WHERE email = ?")
+      .run(customerId, plan, stripeStatus, email.toLowerCase().trim());
+    return this.getAccountByEmail(email);
+  }
+
+  async getAccountByStripeCustomer(customerId: string): Promise<Account | null> {
+    if (!customerId) return null;
+    return (this.db
+      .prepare("SELECT * FROM accounts WHERE stripe_customer_id = ?")
+      .get(customerId) as unknown as Account) ?? null;
   }
 
   async close(): Promise<void> {
