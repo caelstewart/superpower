@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.5.4 — 2026-07-15
+
+- Rebuild to supersede a hung Railway build (no code changes vs 0.5.3: flat
+  design — no filled panels, whitespace + hairline structure).
+
 ## 0.5.3 — 2026-07-15
 
 - Flattened the design: removed the filled panel/card backgrounds and shadows.
