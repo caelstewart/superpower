@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.4.0 — 2026-07-15
+
+- Landing page redesigned from terminal to blueprint aesthetic: off-white grid
+  paper, navy ink, blue accents, spec-sheet title block with corner marks,
+  FIG.-numbered technical panels. Same info, new skin (all portal pages inherit).
+- Added an interactive blind-test quiz near the top: 3 pairs of copy (generic
+  AI vs Superpower), reader picks the human-sounding one, reveal shows they
+  chose Superpower every time, into the pitch + CTA. Self-contained vanilla JS.
+
 ## 0.3.4 — 2026-07-15
 
 - Reworded method/process guidance: framed as "if one comes up" not "users
