@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.5.3 — 2026-07-15
+
+- Flattened the design: removed the filled panel/card backgrounds and shadows.
+  Sections now sit on the paper separated by whitespace + a hairline under each
+  label. Boxing kept only where functional (tappable quiz options, inputs).
+  Header and result use hairline rules instead of boxes.
+
 ## 0.5.2 — 2026-07-15
 
 - Removed all-caps: dropped every text-transform:uppercase and normalized the

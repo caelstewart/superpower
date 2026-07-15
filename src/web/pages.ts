@@ -44,9 +44,8 @@ function shell(title: string, body: string): string {
   ::selection{background:var(--blue);color:#fff}
   .cursor{display:none}
 
-  .banner{border:1px solid var(--rule);background:var(--panel);border-radius:16px;box-shadow:var(--shadow);
-    display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;
-    padding:1.3rem 1.5rem;margin-bottom:1.75rem}
+  .banner{display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;
+    padding:0 0 1.4rem;margin-bottom:2rem;border-bottom:1px solid var(--rule)}
   .wordmark{font-weight:700;font-size:1.65rem;letter-spacing:-.02em;line-height:1}
   .wordmark small{display:block;font-weight:500;font-size:.78rem;letter-spacing:0;
     color:var(--ink-soft);margin-top:.4rem}
@@ -56,8 +55,7 @@ function shell(title: string, body: string): string {
   .lede{font-size:1.15rem;line-height:1.5;max-width:64ch;margin:0 0 .7rem;letter-spacing:-.01em}
   .lede.sub{color:var(--ink-soft);font-size:1rem;letter-spacing:-.006em}
 
-  section.panel{border:1px solid var(--rule);background:var(--panel);border-radius:16px;box-shadow:var(--shadow);
-    padding:1.75rem 1.9rem 1.9rem;margin:1.5rem 0}
+  section.panel{padding:0;margin:3rem 0}
   section.panel h2{font-size:.76rem;letter-spacing:.04em;color:var(--blue);
     font-weight:600;margin-bottom:1.1rem;display:flex;align-items:center;gap:.65rem}
   section.panel h2::before{content:attr(data-fig);color:var(--ink-soft);white-space:nowrap;font-family:var(--mono);font-size:.68rem}
@@ -102,13 +100,13 @@ function shell(title: string, body: string): string {
   .quiz-tag{font-size:.72rem;letter-spacing:.02em;color:var(--ink-soft);margin-bottom:.85rem}
   .cards{display:grid;grid-template-columns:1fr 1fr;gap:1.1rem}
   @media(max-width:720px){.cards{grid-template-columns:1fr}}
-  .card{border:1px solid var(--rule);background:var(--card);padding:1.1rem 1.2rem;cursor:pointer;
-    border-radius:12px;transition:border-color .12s,box-shadow .14s,opacity .12s,transform .1s;
+  .card{border:1px solid var(--rule);background:transparent;padding:1.1rem 1.2rem;cursor:pointer;
+    border-radius:12px;transition:border-color .12s,box-shadow .14s,opacity .12s,transform .1s,background .12s;
     font-size:.98rem;line-height:1.55}
-  .card:hover{border-color:var(--blue);box-shadow:var(--shadow);transform:translateY(-1px)}
+  .card:hover{border-color:var(--blue);background:rgba(42,93,148,.03);transform:translateY(-1px)}
   .card .post{white-space:pre-wrap;max-height:21rem;overflow-y:auto;font-size:.92rem;line-height:1.6}
-  .brief-box{background:var(--blue-soft);padding:.85rem 1.05rem;border-radius:12px;
-    margin:.5rem 0 1.1rem;font-size:.92rem;line-height:1.5}
+  .brief-box{border-left:2px solid var(--blue);padding:.1rem 0 .1rem 1rem;
+    margin:.5rem 0 1.3rem;font-size:.94rem;line-height:1.55;color:var(--ink)}
   .brief-label{display:block;font-size:.66rem;letter-spacing:.06em;
     color:var(--blue);font-weight:600;margin-bottom:.35rem}
   .real-tag{font-size:.62rem;letter-spacing:.04em;color:var(--good);
@@ -121,8 +119,7 @@ function shell(title: string, body: string): string {
   .card.reveal-bad{opacity:.5}
   .verdict{font-size:.72rem;letter-spacing:.03em;margin-top:.8rem;font-weight:600}
   .verdict.good{color:var(--good)} .verdict.bad{color:var(--ink-soft)}
-  .quiz-result{border:1px solid var(--rule);background:linear-gradient(180deg,#f6f2e9,#f1ecdf);border-radius:16px;
-    box-shadow:var(--shadow);padding:1.9rem;margin-top:1.9rem;display:none}
+  .quiz-result{border-top:2px solid var(--ink);padding:1.6rem 0 0;margin-top:2rem;display:none}
   .quiz-result h3{font-size:1.5rem;margin-bottom:.8rem;text-wrap:balance;letter-spacing:-.02em;font-weight:700}
   .quiz-result .score{color:var(--blue);font-weight:800}
 </style>
