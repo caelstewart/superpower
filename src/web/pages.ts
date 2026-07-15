@@ -125,16 +125,6 @@ export function landingPage(error?: string): string {
     <input type="email" id="email" name="email" required placeholder="you@company.com" autocomplete="email">
     <button type="submit">Send login link</button>
   </form>
-</section>
-
-<section class="panel">
-  <h2>login_with_api_key</h2>
-  <p class="line dim">// fallback for API-first users.</p>
-  <form class="term" method="POST" action="/dashboard">
-    <label for="key">api_key:</label>
-    <input type="password" id="key" name="key" required placeholder="sp_live_…" autocomplete="off">
-    <button type="submit">Log in with key</button>
-  </form>
 </section>`);
 }
 
@@ -190,14 +180,14 @@ export function dashboardLoginPage(error?: string): string {
   return shell("superpower — login", `
 <pre class="banner">${BANNER}</pre>
 <section class="panel">
-  <h2>authenticate</h2>
+  <h2>log_in</h2>
+  <p class="line dim">// enter your email and we'll send a one-time login link.</p>
   ${error ? `<p class="line err">! ${esc(error)}</p>` : ""}
-  <form class="term" method="POST" action="/dashboard">
-    <label for="key">api_key:</label>
-    <input type="password" id="key" name="key" required placeholder="sp_live_…" autocomplete="off">
-    <button type="submit">Log in</button>
+  <form class="term" method="POST" action="/login">
+    <label for="email">email:</label>
+    <input type="email" id="email" name="email" required placeholder="you@company.com" autocomplete="email">
+    <button type="submit">Send login link</button>
   </form>
-  <p class="line dim" style="margin-top:.8rem">// no key? <a href="/">sign up</a></p>
 </section>`);
 }
 

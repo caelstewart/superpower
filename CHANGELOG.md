@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.2 — 2026-07-15
+
+- Removed API-key login from the portal entirely (landing section + backend
+  POST /dashboard route). Email magic link is the single auth path; the not-
+  logged-in dashboard now shows the email login form. API keys are purely MCP
+  credentials now, shown on the dashboard, never a login method.
+
 ## 0.3.1 — 2026-07-15
 
 - Email: from "Cael from Superpower" with reply-to, properly-capitalized

@@ -189,21 +189,6 @@ export async function serveHttp(port: number): Promise<void> {
         return;
       }
 
-      // key-based login fallback (API-first users) — also starts a session
-      if (path === "/dashboard" && req.method === "POST") {
-        const form = await readForm(req);
-        const key = (form.get("key") ?? "").trim();
-        const account = key ? await store.getAccountByKey(key) : null;
-        if (!account) {
-          html(res, dashboardLoginPage("key not recognized"), 401);
-          return;
-        }
-        html(res, dashboardPage(account, baseUrl(req), billing), 200, {
-          "set-cookie": makeSessionCookie(account.email, isSecure(req)),
-        });
-        return;
-      }
-
       if (path === "/account/rotate" && req.method === "POST") {
         const email = readSession(req.headers.cookie);
         const account = email ? await store.getAccountByEmail(email) : null;
