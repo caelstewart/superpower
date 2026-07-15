@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.3.3 — 2026-07-15
+
+- Bring-your-own method routing: the system now understands how to use a user's
+  writing process / framework / copy guide. Server instructions + voice-capture
+  skill teach the agent to run the method during brainstorming to build a
+  richer brief, then generate in the captured voice — method decides WHAT,
+  voice decides HOW. Never routed into the generation prompt.
+- examples/direct-response-copy-skill.md added as the worked reference (a
+  general cross-voice DR framework). Composition verified: DR-structured brief
+  through the rob-snyder voice produced full DR structure in his sound.
+
 ## 0.3.2 — 2026-07-15
 
 - Removed API-key login from the portal entirely (landing section + backend

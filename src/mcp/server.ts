@@ -38,7 +38,13 @@ export function buildServer(store: Store): McpServer {
         "heading or dividers, never summarized, excerpted, or described instead of shown. " +
         "All process narration, build detail, and analysis goes AFTER the copy, never before " +
         "or around it. Applies unless the user explicitly asked not to see it. The same " +
-        "applies to critique_copy violation lists.",
+        "applies to revise_copy output and critique_copy violation lists. " +
+        "METHOD/PROCESS FILES: if the user has their own writing process, framework, or copy " +
+        "guide (e.g. a direct-response method), use it during brainstorming to build a richer " +
+        "brief — the structure, angle, and hooks it calls for — then pass that brief to " +
+        "generate_copy. The method decides WHAT the copy says; the captured voice decides HOW " +
+        "it sounds. Never pass the method as generation instructions or let its style opinions " +
+        "override the voice's examples.",
     }
   );
 

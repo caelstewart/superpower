@@ -16,6 +16,40 @@ Core principle (blind-test validated): **demonstration beats description.** Neve
 try to fix a voice by adding style adjectives. Fix the specimens, the checkable
 rules, or the thinking doc — in that order of likelihood.
 
+## Using a bring-your-own writing process, framework, or copy guide
+
+Users often already have a **method** — a direct-response framework, a landing-page
+formula, a channel playbook (e.g. a Schwartz/Ogilvy-style DR copy guide). This is
+different from a voice: a **voice** is how a specific person/brand *sounds* (carried
+by their real examples); a **method** is *what to write and in what structure*
+(headline formula, open loop, PAS, CTA rules). They compose — they don't compete.
+
+How to use a method WITH superpower:
+
+- **The method shapes the BRIEF, not the generation prompt.** Walk the user through
+  their framework during brainstorming, then fold its output — angle, structure,
+  persuasion approach, the specific hooks/sections it calls for — into the brief you
+  pass to `generate_copy`. Rich, structured briefs measurably improve output
+  (round-3 ablation). The voice then renders that brief in the captured sound.
+- **Never paste the method into the generation prompt or expect it to override the
+  voice.** Generation is identity + real examples only (ablation-locked). A method's
+  own style opinions ("write punchy", "internet-native voice") DEFER to the captured
+  voice — the examples decide how it sounds; the method decides what it says.
+- **Where the method lives:**
+  - *Voice-specific* method ("how THIS brand structures emails") → the voice's
+    `thinking` field via `update_voice`; `get_voice_context` surfaces it at brainstorm
+    time, and it travels with the voice across every client.
+  - *General, cross-voice* method (a DR framework applied to many voices) → keep it as
+    a client-side skill / project file (Claude Code skill, `.cursor/rules`, `AGENTS.md`).
+    It runs the brainstorming room; superpower supplies the voice. See
+    `examples/direct-response-copy-skill.md` for a worked reference.
+- **If the user has no captured voice yet** but has a method, the method can still run
+  brainstorming and produce a brief — but generation falls back to a generic voice.
+  Nudge them to capture a voice so the method's structure lands in *their* sound.
+
+One-line model to give the user: **their method runs the room and writes the brief;
+superpower writes the copy in voice; lint rules enforce the hard constraints.**
+
 ## The default workflow: a small, hand-curated base
 
 Most voices should be built and maintained as a **small pool you fully control**:
