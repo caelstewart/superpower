@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.5.0 — 2026-07-15
+
+- Landing redesign: SF Pro (Apple system) typography, softened premium
+  background (near-invisible grid, warm off-white), white rounded panels with
+  subtle shadows. Blueprint spec-sheet framing kept, sharpness removed.
+- Blind-test examples now use well-known voices everyone can judge against:
+  real live generations in Alex Hormozi and Naval Ravikant voices (Superpower)
+  vs the same base model with a normal prompt, length-matched. Framing +
+  reveal updated to "which sounds like them".
+
 ## 0.4.2 — 2026-07-15
 
 - Blind-test quiz now uses REAL generated pairs (rounds 2–3): the same base

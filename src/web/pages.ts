@@ -18,9 +18,12 @@ function shell(title: string, body: string): string {
 <title>${esc(title)}</title>
 <style>
   :root{
-    --paper:#f2efe3; --panel:#f8f6ee; --card:#fbfaf4; --ink:#1b2a3d; --ink-soft:#5d6b7a;
-    --blue:#2f5c9e; --blue-soft:#e4eaf3; --rule:#cbc4ad; --good:#2b6b46;
-    --warn:#8a5a00; --err:#a23b2c; --grid:rgba(47,92,158,.075);
+    --paper:#f5f3ee; --panel:#ffffff; --card:#ffffff; --ink:#1d1d1f; --ink-soft:#6e6e73;
+    --blue:#215d9c; --blue-soft:#eef3f9; --rule:#e7e3d9; --good:#1f8a54;
+    --warn:#8a5a00; --err:#c0392b; --grid:rgba(33,93,156,.028);
+    --shadow:0 1px 2px rgba(20,26,40,.05), 0 14px 34px -18px rgba(20,26,40,.14);
+    --sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Segoe UI",system-ui,Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{min-height:100%}
@@ -28,101 +31,100 @@ function shell(title: string, body: string): string {
     background-color:var(--paper);
     background-image:linear-gradient(var(--grid) 1px,transparent 1px),
       linear-gradient(90deg,var(--grid) 1px,transparent 1px);
-    background-size:26px 26px;
+    background-size:44px 44px;
     color:var(--ink);
-    font:14.5px/1.62 "SF Mono",ui-monospace,Menlo,Consolas,"DejaVu Sans Mono",monospace;
-    padding:2.5rem 1.25rem 5rem;
+    font:16px/1.55 var(--sans);
+    -webkit-font-smoothing:antialiased;
+    letter-spacing:-.006em;
+    padding:2.75rem 1.25rem 5rem;
   }
-  main{max-width:940px;margin:0 auto}
+  main{max-width:920px;margin:0 auto}
   a{color:var(--blue)}
-  b{font-weight:700}
+  b{font-weight:600}
   ::selection{background:var(--blue);color:#fff}
   .cursor{display:none}
 
-  .banner{border:1.5px solid var(--ink);background:var(--panel);
+  .banner{border:1px solid var(--rule);background:var(--panel);border-radius:16px;box-shadow:var(--shadow);
     display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;
-    padding:1.1rem 1.3rem;margin-bottom:1.5rem;position:relative}
-  .banner::before,.banner::after{content:"";position:absolute;width:10px;height:10px;border:1.5px solid var(--ink)}
-  .banner::before{top:-1.5px;left:-1.5px;border-right:none;border-bottom:none}
-  .banner::after{bottom:-1.5px;right:-1.5px;border-left:none;border-top:none}
-  .wordmark{font-weight:700;font-size:1.7rem;letter-spacing:.16em;line-height:1}
-  .wordmark small{display:block;font-weight:500;font-size:.64rem;letter-spacing:.2em;
-    text-transform:uppercase;color:var(--blue);margin-top:.5rem}
-  .specblock{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.64rem;
-    line-height:1.6;color:var(--ink-soft);text-align:right;letter-spacing:.02em}
-  .specblock b{color:var(--ink)}
+    padding:1.3rem 1.5rem;margin-bottom:1.75rem}
+  .wordmark{font-weight:700;font-size:1.65rem;letter-spacing:-.02em;line-height:1}
+  .wordmark small{display:block;font-weight:500;font-size:.78rem;letter-spacing:0;
+    color:var(--ink-soft);margin-top:.4rem}
+  .specblock{font-family:var(--mono);font-size:.66rem;line-height:1.7;color:var(--ink-soft);text-align:right}
+  .specblock b{color:var(--ink);font-weight:600}
 
-  .lede{font-size:.95rem;line-height:1.6;max-width:70ch;margin:0 0 .6rem}
-  .lede.sub{color:var(--ink-soft);font-size:.9rem}
+  .lede{font-size:1.15rem;line-height:1.5;max-width:64ch;margin:0 0 .7rem;letter-spacing:-.01em}
+  .lede.sub{color:var(--ink-soft);font-size:1rem;letter-spacing:-.006em}
 
-  section.panel{border:1px solid var(--rule);background:var(--panel);
-    padding:1.4rem 1.5rem 1.6rem;margin:1.75rem 0;position:relative}
-  section.panel h2{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.72rem;
-    letter-spacing:.18em;text-transform:uppercase;color:var(--blue);font-weight:700;
-    margin-bottom:1rem;display:flex;align-items:center;gap:.65rem}
-  section.panel h2::before{content:attr(data-fig);color:var(--ink-soft);white-space:nowrap}
+  section.panel{border:1px solid var(--rule);background:var(--panel);border-radius:16px;box-shadow:var(--shadow);
+    padding:1.75rem 1.9rem 1.9rem;margin:1.5rem 0}
+  section.panel h2{font-size:.76rem;letter-spacing:.04em;text-transform:uppercase;color:var(--blue);
+    font-weight:600;margin-bottom:1.1rem;display:flex;align-items:center;gap:.65rem}
+  section.panel h2::before{content:attr(data-fig);color:var(--ink-soft);white-space:nowrap;font-family:var(--mono);font-size:.68rem}
   section.panel h2::after{content:"";flex:1;height:1px;background:var(--rule)}
 
-  .line{margin:.35rem 0}
+  .line{margin:.4rem 0}
   .dim{color:var(--ink-soft)}
   .warn{color:var(--warn)} .err{color:var(--err)}
-  .out::before{content:"— ";color:var(--blue)}
-  .prompt{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.92rem;margin:.5rem 0}
-  .prompt::before{content:"› ";color:var(--blue);font-weight:700}
+  .out::before{content:"";}
+  .prompt{font-size:1rem;margin:.6rem 0;font-weight:450}
+  .prompt::before{content:"›";color:var(--blue);font-weight:700;margin-right:.5rem}
 
-  form.term{display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-top:1rem}
-  form.term label{color:var(--ink-soft);font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.85rem}
+  form.term{display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-top:1.1rem}
+  form.term label{color:var(--ink-soft);font-size:.92rem}
   input[type=email],input[type=password],input[type=text]{
-    background:#fff;border:1px solid var(--rule);color:var(--ink);font:inherit;
-    padding:.6rem .8rem;min-width:min(320px,70vw);border-radius:2px}
-  input:focus{outline:2px solid var(--blue);border-color:var(--blue)}
+    background:#fff;border:1px solid #d9d4c8;color:var(--ink);font:inherit;
+    padding:.65rem .85rem;min-width:min(320px,70vw);border-radius:10px}
+  input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-soft)}
   button{background:var(--blue);border:1px solid var(--blue);color:#fff;font:inherit;
-    font-weight:600;padding:.6rem 1.2rem;cursor:pointer;border-radius:2px}
-  button:hover{background:#24487c}
+    font-weight:600;padding:.65rem 1.3rem;cursor:pointer;border-radius:10px;letter-spacing:-.01em;
+    transition:transform .08s,background .12s}
+  button:hover{background:#1a4c82}
+  button:active{transform:scale(.98)}
 
-  code.block,pre.block{display:block;background:var(--card);border:1px solid var(--rule);
-    padding:.85rem 1rem;margin:.6rem 0;overflow-x:auto;border-radius:2px;
-    font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.84em;white-space:pre;color:var(--ink)}
+  code.block,pre.block{display:block;background:#faf8f3;border:1px solid var(--rule);
+    padding:.9rem 1.05rem;margin:.6rem 0;overflow-x:auto;border-radius:10px;
+    font-family:var(--mono);font-size:.82em;white-space:pre;color:var(--ink)}
   table{border-collapse:collapse;width:100%;margin-top:.4rem}
-  td{padding:.4rem .9rem .4rem 0;vertical-align:top}
-  td:first-child{color:var(--ink-soft);white-space:nowrap;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.85rem}
+  td{padding:.45rem .9rem .45rem 0;vertical-align:top}
+  td:first-child{color:var(--ink-soft);white-space:nowrap;font-size:.9rem}
   .status-active{color:var(--good)} .status-none{color:var(--warn)}
   .status-past_due,.status-canceled{color:var(--err)}
   .copybtn{background:transparent;color:var(--blue);border:1px solid var(--rule);
-    padding:.2rem .7rem;font-size:.8em;margin-left:.5rem;font-weight:500}
-  footer{margin-top:3rem;padding-top:1rem;border-top:1px solid var(--rule);
-    color:var(--ink-soft);font-size:.72rem;font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:.06em}
+    padding:.25rem .75rem;font-size:.8em;margin-left:.5rem;font-weight:500;border-radius:8px}
+  footer{margin-top:3rem;padding-top:1.2rem;border-top:1px solid var(--rule);
+    color:var(--ink-soft);font-size:.78rem;letter-spacing:.01em}
 
   /* blind-test quiz */
-  .quiz-intro{margin-bottom:1.25rem}
-  .quiz-round{margin:1.5rem 0}
-  .quiz-q{font-weight:600;margin-bottom:.15rem}
-  .quiz-tag{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.66rem;letter-spacing:.16em;
-    text-transform:uppercase;color:var(--ink-soft);margin-bottom:.75rem}
-  .cards{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+  .quiz-intro{margin-bottom:1.4rem;font-size:1rem;line-height:1.55}
+  .quiz-round{margin:1.75rem 0}
+  .quiz-q{font-weight:600;font-size:1.05rem;margin-bottom:.2rem;letter-spacing:-.01em}
+  .quiz-tag{font-size:.72rem;letter-spacing:.02em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:.85rem}
+  .cards{display:grid;grid-template-columns:1fr 1fr;gap:1.1rem}
   @media(max-width:720px){.cards{grid-template-columns:1fr}}
-  .card{border:1px solid var(--rule);background:var(--card);padding:1rem 1.1rem;cursor:pointer;
-    border-radius:2px;transition:border-color .12s,background .12s,opacity .12s;font-size:.95rem;line-height:1.5}
-  .card:hover{border-color:var(--blue)}
-  .card .post{white-space:pre-wrap;max-height:21rem;overflow-y:auto;font-size:.88rem;line-height:1.55}
-  .brief-box{border-left:3px solid var(--blue);background:var(--blue-soft);padding:.7rem .95rem;
-    margin:.4rem 0 1rem;font-size:.86rem;line-height:1.5}
-  .brief-label{display:block;font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;
-    color:var(--blue);font-weight:700;margin-bottom:.35rem}
-  .real-tag{font-size:.58rem;letter-spacing:.09em;text-transform:uppercase;color:var(--good);
-    border:1px solid var(--good);padding:.06rem .4rem;border-radius:2px;font-weight:700;
-    vertical-align:middle;margin-left:.4rem}
-  .card .pick{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.66rem;letter-spacing:.12em;
-    text-transform:uppercase;color:var(--blue);margin-top:.8rem;display:block}
-  .card.chosen{border-color:var(--blue);border-width:2px}
-  .card.reveal-good{border-color:var(--good);background:#e9f1ec}
-  .card.reveal-bad{opacity:.55}
-  .verdict{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.7rem;letter-spacing:.08em;
-    text-transform:uppercase;margin-top:.7rem;font-weight:700}
+  .card{border:1px solid var(--rule);background:var(--card);padding:1.1rem 1.2rem;cursor:pointer;
+    border-radius:12px;transition:border-color .12s,box-shadow .14s,opacity .12s,transform .1s;
+    font-size:.98rem;line-height:1.55}
+  .card:hover{border-color:var(--blue);box-shadow:var(--shadow);transform:translateY(-1px)}
+  .card .post{white-space:pre-wrap;max-height:21rem;overflow-y:auto;font-size:.92rem;line-height:1.6}
+  .brief-box{background:var(--blue-soft);padding:.85rem 1.05rem;border-radius:12px;
+    margin:.5rem 0 1.1rem;font-size:.92rem;line-height:1.5}
+  .brief-label{display:block;font-size:.66rem;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--blue);font-weight:600;margin-bottom:.35rem}
+  .real-tag{font-size:.62rem;letter-spacing:.04em;text-transform:uppercase;color:var(--good);
+    background:#e8f5ee;padding:.12rem .5rem;border-radius:20px;font-weight:600;
+    vertical-align:middle;margin-left:.5rem}
+  .card .pick{font-size:.7rem;letter-spacing:.02em;text-transform:uppercase;color:var(--blue);
+    margin-top:.85rem;display:block;font-weight:600}
+  .card.chosen{border-color:var(--blue);box-shadow:0 0 0 2px var(--blue)}
+  .card.reveal-good{border-color:var(--good);background:#f1f9f4}
+  .card.reveal-bad{opacity:.5}
+  .verdict{font-size:.72rem;letter-spacing:.03em;text-transform:uppercase;margin-top:.8rem;font-weight:600}
   .verdict.good{color:var(--good)} .verdict.bad{color:var(--ink-soft)}
-  .quiz-result{border:1.5px solid var(--ink);background:var(--panel);padding:1.6rem;margin-top:1.75rem;display:none}
-  .quiz-result h3{font-size:1.3rem;margin-bottom:.7rem;text-wrap:balance}
-  .quiz-result .score{font-family:ui-monospace,Menlo,Consolas,monospace;color:var(--blue);font-weight:800}
+  .quiz-result{border:1px solid var(--rule);background:linear-gradient(180deg,#fff,#fbfaf6);border-radius:16px;
+    box-shadow:var(--shadow);padding:1.9rem;margin-top:1.9rem;display:none}
+  .quiz-result h3{font-size:1.5rem;margin-bottom:.8rem;text-wrap:balance;letter-spacing:-.02em;font-weight:700}
+  .quiz-result .score{color:var(--blue);font-weight:800}
 </style>
 </head>
 <body><main>${body}
@@ -168,18 +170,18 @@ export function landingPage(error?: string): string {
   return shell("Superpower — The Invisible Brand-Voice Engine", `
 ${BANNER}
 <p class="lede">Your team writes inside Claude Code, Cursor, and Windsurf. Superpower generates every piece of customer-facing copy in your captured voice — triggered automatically, powered by your real work.</p>
-<p class="lede sub">Before the pitch, run the test. Pick the one in each pair that sounds like a real person wrote it.</p>
+<p class="lede sub">Before the pitch, run the test. Two versions of each piece — pick the one that sounds right. For the named voices, the one that actually sounds like them.</p>
 
 <section class="panel">
   <h2 data-fig="FIG. 01">The Blind Test</h2>
-  <p class="quiz-intro dim">One in each pair is generic AI. One was written the Superpower way — the same base model, but writing in a voice captured from real work. The longer rounds are <b>real, unedited output generated live</b>: same brief, same model, one normal prompt vs one captured voice. Tap the one that reads human.</p>
+  <p class="quiz-intro dim">Each pair: one written the Superpower way — the same base model, but writing from a voice captured from real work — and one from that model with a normal prompt. The named rounds are <b>real, unedited output generated live</b>. For those, tap the one that actually sounds like them.</p>
 ${rounds}
 
   <div class="quiz-result" id="quiz-result">
-    <h3>You picked the human one <span class="score" id="qscore">0 / 3</span> times.</h3>
-    <p class="lede">Every sample you chose as the real, human-sounding one was made by Superpower. The other was what generic AI hands you by default — the "unlock / leverage / in today's fast-paced world" copy readers scroll straight past.</p>
-    <p class="lede sub">You spotted the difference in seconds. So does every customer reading your emails, ads, and landing pages. Superpower is how your AI stops sounding like AI: it writes in a voice captured from your real work, not a template. Now do it for your own copy.</p>
-    <p class="line" style="margin-top:1.1rem"><a href="#get-started"><button type="button">Capture your voice →</button></a></p>
+    <h3>You matched the voice <span class="score" id="qscore">0 / 3</span> times.</h3>
+    <p class="lede">The version that actually sounded like them — tighter, no filler, unmistakably their voice — was Superpower every time: the same base model, but writing from a voice captured from real work. The other was that model with a normal prompt.</p>
+    <p class="lede sub">That gap is the whole product. On your own copy it's the difference between something people read and something they scroll past. Superpower captures a voice from your best work and writes every piece in it — right inside the tools your team already uses.</p>
+    <p class="line" style="margin-top:1.2rem"><a href="#get-started"><button type="button">Capture your voice →</button></a></p>
   </div>
 </section>
 
@@ -218,7 +220,7 @@ ${rounds}
           var p=c.querySelector('.pick'); if(p) p.remove();
           var v=document.createElement('div');
           v.className='verdict '+(good?'good':'bad');
-          v.textContent=good?'\\u2713 Superpower — reads human':'\\u2717 Generic AI';
+          v.textContent=good?'\\u2713 Superpower — captured voice':'\\u2717 Generic AI — normal prompt';
           c.appendChild(v);
         });
         card.classList.add('chosen');
