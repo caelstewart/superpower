@@ -4,6 +4,7 @@
  * external assets, no build step.
  */
 import type { Account } from "../core/types.js";
+import { QUIZ_EXAMPLES } from "./examples.js";
 
 const esc = (s: string) =>
   s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -103,6 +104,14 @@ function shell(title: string, body: string): string {
   .card{border:1px solid var(--rule);background:var(--card);padding:1rem 1.1rem;cursor:pointer;
     border-radius:2px;transition:border-color .12s,background .12s,opacity .12s;font-size:.95rem;line-height:1.5}
   .card:hover{border-color:var(--blue)}
+  .card .post{white-space:pre-wrap;max-height:21rem;overflow-y:auto;font-size:.88rem;line-height:1.55}
+  .brief-box{border-left:3px solid var(--blue);background:var(--blue-soft);padding:.7rem .95rem;
+    margin:.4rem 0 1rem;font-size:.86rem;line-height:1.5}
+  .brief-label{display:block;font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--blue);font-weight:700;margin-bottom:.35rem}
+  .real-tag{font-size:.58rem;letter-spacing:.09em;text-transform:uppercase;color:var(--good);
+    border:1px solid var(--good);padding:.06rem .4rem;border-radius:2px;font-weight:700;
+    vertical-align:middle;margin-left:.4rem}
   .card .pick{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.66rem;letter-spacing:.12em;
     text-transform:uppercase;color:var(--blue);margin-top:.8rem;display:block}
   .card.chosen{border-color:var(--blue);border-width:2px}
@@ -140,41 +149,31 @@ const BANNER = `<div class="banner">
 </div>`;
 
 export function landingPage(error?: string): string {
+  const rounds = QUIZ_EXAMPLES.map((ex, i) => {
+    const humanLeft = i % 2 === 1; // alternate side so position isn't a tell
+    const humanCard = `<div class="card" data-good="1"><div class="post">${esc(ex.human)}</div><span class="pick">Tap to choose</span></div>`;
+    const aiCard = `<div class="card" data-good="0"><div class="post">${esc(ex.ai)}</div><span class="pick">Tap to choose</span></div>`;
+    const briefBox = ex.brief
+      ? `<div class="brief-box"><span class="brief-label">The brief</span>${esc(ex.brief)}</div>`
+      : "";
+    return `
+  <div class="quiz-round" data-round="${i + 1}">
+    <p class="quiz-q">${esc(ex.label)}${ex.real ? ` <span class="real-tag">real · generated live</span>` : ""}</p>
+    <p class="quiz-tag">Round ${i + 1} of ${QUIZ_EXAMPLES.length}</p>
+    ${briefBox}
+    <div class="cards">${humanLeft ? humanCard + aiCard : aiCard + humanCard}</div>
+  </div>`;
+  }).join("\n");
+
   return shell("Superpower — The Invisible Brand-Voice Engine", `
 ${BANNER}
 <p class="lede">Your team writes inside Claude Code, Cursor, and Windsurf. Superpower generates every piece of customer-facing copy in your captured voice — triggered automatically, powered by your real work.</p>
-<p class="lede sub">Before the pitch, run the test. Three pairs of copy. Pick the one in each that sounds like a real person wrote it.</p>
+<p class="lede sub">Before the pitch, run the test. Pick the one in each pair that sounds like a real person wrote it.</p>
 
 <section class="panel">
   <h2 data-fig="FIG. 01">The Blind Test</h2>
-  <p class="quiz-intro dim">One in each pair is generic AI. One was written the Superpower way — in a voice captured from real work. Tap the one that reads human.</p>
-
-  <div class="quiz-round" data-round="1">
-    <p class="quiz-q">A welcome email, first two lines.</p>
-    <p class="quiz-tag">Round 1 of 3</p>
-    <div class="cards">
-      <div class="card" data-good="0">Welcome aboard! We're thrilled to have you join our community. In today's fast-paced world your time is valuable, so we've built our platform to help you unlock your full potential and elevate your workflow.<span class="pick">Tap to choose</span></div>
-      <div class="card" data-good="1">You're in. One thing before you explore: the mistake almost everyone makes on day one is skipping setup and jumping straight to sending. Don't. Four minutes now and everything after feels obvious.<span class="pick">Tap to choose</span></div>
-    </div>
-  </div>
-
-  <div class="quiz-round" data-round="2">
-    <p class="quiz-q">A landing-page headline for a scheduling tool.</p>
-    <p class="quiz-tag">Round 2 of 3</p>
-    <div class="cards">
-      <div class="card" data-good="1">Stop emailing back and forth about times. Send one link. Done.<span class="pick">Tap to choose</span></div>
-      <div class="card" data-good="0">Revolutionize Your Productivity With Our Cutting-Edge, AI-Powered Scheduling Solution<span class="pick">Tap to choose</span></div>
-    </div>
-  </div>
-
-  <div class="quiz-round" data-round="3">
-    <p class="quiz-q">A social post announcing a feature.</p>
-    <p class="quiz-tag">Round 3 of 3</p>
-    <div class="cards">
-      <div class="card" data-good="1">We gave it twelve of our best-performing emails and asked it to write the thirteenth. Our head of content couldn't tell which one the human wrote. That's the whole product.<span class="pick">Tap to choose</span></div>
-      <div class="card" data-good="0">We're thrilled to announce a game-changing new feature that leverages state-of-the-art AI to seamlessly streamline your content creation and drive unprecedented engagement!<span class="pick">Tap to choose</span></div>
-    </div>
-  </div>
+  <p class="quiz-intro dim">One in each pair is generic AI. One was written the Superpower way — the same base model, but writing in a voice captured from real work. The longer rounds are <b>real, unedited output generated live</b>: same brief, same model, one normal prompt vs one captured voice. Tap the one that reads human.</p>
+${rounds}
 
   <div class="quiz-result" id="quiz-result">
     <h3>You picked the human one <span class="score" id="qscore">0 / 3</span> times.</h3>
