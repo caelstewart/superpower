@@ -16,21 +16,31 @@ Core principle (blind-test validated): **demonstration beats description.** Neve
 try to fix a voice by adding style adjectives. Fix the specimens, the checkable
 rules, or the thinking doc — in that order of likelihood.
 
-## Using a bring-your-own writing process, framework, or copy guide
+## If a user brings their own writing process, framework, or copy guide
 
-Users often already have a **method** — a direct-response framework, a landing-page
-formula, a channel playbook (e.g. a Schwartz/Ogilvy-style DR copy guide). This is
-different from a voice: a **voice** is how a specific person/brand *sounds* (carried
-by their real examples); a **method** is *what to write and in what structure*
-(headline formula, open loop, PAS, CTA rules). They compose — they don't compete.
+Most users won't have one — don't expect or ask for it. But sometimes a user has a
+**method**: a direct-response framework, a landing-page formula, a channel playbook
+(e.g. a Schwartz/Ogilvy-style DR copy guide). When that comes up, here's how to use
+it so it composes with a voice instead of fighting it. (No method? Ignore this
+section — the voice's own examples already carry its patterns.)
+
+A method is different from a voice: a **voice** is how a specific person/brand
+*sounds* (carried by their real examples); a **method** is *what to write and in what
+structure* (headline formula, open loop, PAS, CTA rules). They compose — they don't
+compete.
 
 How to use a method WITH superpower:
 
-- **The method shapes the BRIEF, not the generation prompt.** Walk the user through
-  their framework during brainstorming, then fold its output — angle, structure,
-  persuasion approach, the specific hooks/sections it calls for — into the brief you
-  pass to `generate_copy`. Rich, structured briefs measurably improve output
-  (round-3 ablation). The voice then renders that brief in the captured sound.
+- **The method's output must land in the BRIEF as concrete instructions — that's the
+  only thing that carries it into generation.** Don't just loosely "brainstorm with
+  the framework" and pass a thin brief; the method's power is lost that way. Fold its
+  actual structure into the brief as explicit lines ("headline: specificity formula;
+  open with an open loop; quantify the pain; one disqualification line; single CTA").
+  Generation renders the brief in voice, so a rich, structured brief is what makes the
+  method survive (round-3 ablation: structured briefs measurably improve output; a
+  live DR-brief → rob-snyder test reproduced the full DR skeleton in his voice).
+- **Never route the method into the generation prompt.** It shapes the brief, nothing
+  more.
 - **Never paste the method into the generation prompt or expect it to override the
   voice.** Generation is identity + real examples only (ablation-locked). A method's
   own style opinions ("write punchy", "internet-native voice") DEFER to the captured

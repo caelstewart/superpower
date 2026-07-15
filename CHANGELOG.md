@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.4 — 2026-07-15
+
+- Reworded method/process guidance: framed as "if one comes up" not "users
+  usually have one" (they usually don't); made explicit that the method's power
+  survives only when its concrete structure is folded into the brief, not left
+  loose in brainstorming.
+
 ## 0.3.3 — 2026-07-15
 
 - Bring-your-own method routing: the system now understands how to use a user's
