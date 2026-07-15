@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.5.2 — 2026-07-15
+
+- Removed all-caps: dropped every text-transform:uppercase and normalized the
+  literally-capsed strings (wordmark, spec block, footer) to normal case.
+
 ## 0.5.1 — 2026-07-15
 
 - Palette fix: replaced the stark white panels with warm cream tones (cream

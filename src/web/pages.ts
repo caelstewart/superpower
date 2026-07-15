@@ -58,7 +58,7 @@ function shell(title: string, body: string): string {
 
   section.panel{border:1px solid var(--rule);background:var(--panel);border-radius:16px;box-shadow:var(--shadow);
     padding:1.75rem 1.9rem 1.9rem;margin:1.5rem 0}
-  section.panel h2{font-size:.76rem;letter-spacing:.04em;text-transform:uppercase;color:var(--blue);
+  section.panel h2{font-size:.76rem;letter-spacing:.04em;color:var(--blue);
     font-weight:600;margin-bottom:1.1rem;display:flex;align-items:center;gap:.65rem}
   section.panel h2::before{content:attr(data-fig);color:var(--ink-soft);white-space:nowrap;font-family:var(--mono);font-size:.68rem}
   section.panel h2::after{content:"";flex:1;height:1px;background:var(--rule)}
@@ -99,7 +99,7 @@ function shell(title: string, body: string): string {
   .quiz-intro{margin-bottom:1.4rem;font-size:1rem;line-height:1.55}
   .quiz-round{margin:1.75rem 0}
   .quiz-q{font-weight:600;font-size:1.05rem;margin-bottom:.2rem;letter-spacing:-.01em}
-  .quiz-tag{font-size:.72rem;letter-spacing:.02em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:.85rem}
+  .quiz-tag{font-size:.72rem;letter-spacing:.02em;color:var(--ink-soft);margin-bottom:.85rem}
   .cards{display:grid;grid-template-columns:1fr 1fr;gap:1.1rem}
   @media(max-width:720px){.cards{grid-template-columns:1fr}}
   .card{border:1px solid var(--rule);background:var(--card);padding:1.1rem 1.2rem;cursor:pointer;
@@ -109,17 +109,17 @@ function shell(title: string, body: string): string {
   .card .post{white-space:pre-wrap;max-height:21rem;overflow-y:auto;font-size:.92rem;line-height:1.6}
   .brief-box{background:var(--blue-soft);padding:.85rem 1.05rem;border-radius:12px;
     margin:.5rem 0 1.1rem;font-size:.92rem;line-height:1.5}
-  .brief-label{display:block;font-size:.66rem;letter-spacing:.06em;text-transform:uppercase;
+  .brief-label{display:block;font-size:.66rem;letter-spacing:.06em;
     color:var(--blue);font-weight:600;margin-bottom:.35rem}
-  .real-tag{font-size:.62rem;letter-spacing:.04em;text-transform:uppercase;color:var(--good);
+  .real-tag{font-size:.62rem;letter-spacing:.04em;color:var(--good);
     background:#e3ecd7;padding:.12rem .5rem;border-radius:20px;font-weight:600;
     vertical-align:middle;margin-left:.5rem}
-  .card .pick{font-size:.7rem;letter-spacing:.02em;text-transform:uppercase;color:var(--blue);
+  .card .pick{font-size:.7rem;letter-spacing:.02em;color:var(--blue);
     margin-top:.85rem;display:block;font-weight:600}
   .card.chosen{border-color:var(--blue);box-shadow:0 0 0 2px var(--blue)}
   .card.reveal-good{border-color:var(--good);background:#e9f0e0}
   .card.reveal-bad{opacity:.5}
-  .verdict{font-size:.72rem;letter-spacing:.03em;text-transform:uppercase;margin-top:.8rem;font-weight:600}
+  .verdict{font-size:.72rem;letter-spacing:.03em;margin-top:.8rem;font-weight:600}
   .verdict.good{color:var(--good)} .verdict.bad{color:var(--ink-soft)}
   .quiz-result{border:1px solid var(--rule);background:linear-gradient(180deg,#f6f2e9,#f1ecdf);border-radius:16px;
     box-shadow:var(--shadow);padding:1.9rem;margin-top:1.9rem;display:none}
@@ -128,7 +128,7 @@ function shell(title: string, body: string): string {
 </style>
 </head>
 <body><main>${body}
-<footer>SUPERPOWER · MERGE LABS · © 2026 STEWART VENTURES INC.</footer>
+<footer>Superpower · Merge Labs · © 2026 Stewart Ventures Inc.</footer>
 </main>
 <script>
   function cp(id, btn) {
@@ -141,12 +141,12 @@ function shell(title: string, body: string): string {
 }
 
 const BANNER = `<div class="banner">
-  <div class="wordmark">SUPERPOWER<small>The Invisible Brand-Voice Engine</small></div>
+  <div class="wordmark">Superpower<small>The Invisible Brand-Voice Engine</small></div>
   <div class="specblock">
-    UNIT: <b>MCP-CORE</b><br>
-    BUILT BY: <b>MERGE LABS</b><br>
-    STATUS: <b>OPERATIONAL</b><br>
-    CLIENTS: CLAUDE CODE · CURSOR · WINDSURF
+    Unit: <b>MCP-Core</b><br>
+    Built by: <b>Merge Labs</b><br>
+    Status: <b>Operational</b><br>
+    Clients: Claude Code · Cursor · Windsurf
   </div>
 </div>`;
 
