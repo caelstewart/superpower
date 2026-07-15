@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.2 — 2026-07-15
+
+- Blind-test quiz now uses REAL generated pairs (rounds 2–3): the same base
+  model through a captured voice (Superpower) vs a normal prompt, shown with the
+  brief above each pair. Longer, side-by-side, honest. Data in
+  src/web/examples.ts; markdown emphasis stripped for clean display.
+
 ## 0.4.1 — 2026-07-15
 
 - Typography: monospace terminal type throughout on the blueprint background
