@@ -7,3 +7,6 @@ test-dist/
 .DS_Store
 *.log
 .gstack/
+
+# internal working notes — never shipped
+MEMORY.md
