@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.4.1 — 2026-07-15
+
+- Typography: monospace terminal type throughout on the blueprint background
+  (was sans). Blueprint palette/grid unchanged.
+
 ## 0.4.0 — 2026-07-15
 
 - Landing page redesigned from terminal to blueprint aesthetic: off-white grid

@@ -29,12 +29,12 @@ function shell(title: string, body: string): string {
       linear-gradient(90deg,var(--grid) 1px,transparent 1px);
     background-size:26px 26px;
     color:var(--ink);
-    font:16px/1.6 ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    font:14.5px/1.62 "SF Mono",ui-monospace,Menlo,Consolas,"DejaVu Sans Mono",monospace;
     padding:2.5rem 1.25rem 5rem;
   }
   main{max-width:940px;margin:0 auto}
   a{color:var(--blue)}
-  b{font-weight:600}
+  b{font-weight:700}
   ::selection{background:var(--blue);color:#fff}
   .cursor{display:none}
 
@@ -44,15 +44,15 @@ function shell(title: string, body: string): string {
   .banner::before,.banner::after{content:"";position:absolute;width:10px;height:10px;border:1.5px solid var(--ink)}
   .banner::before{top:-1.5px;left:-1.5px;border-right:none;border-bottom:none}
   .banner::after{bottom:-1.5px;right:-1.5px;border-left:none;border-top:none}
-  .wordmark{font-weight:800;font-size:1.9rem;letter-spacing:.14em;line-height:1}
-  .wordmark small{display:block;font-weight:500;font-size:.68rem;letter-spacing:.22em;
-    text-transform:uppercase;color:var(--blue);margin-top:.4rem}
+  .wordmark{font-weight:700;font-size:1.7rem;letter-spacing:.16em;line-height:1}
+  .wordmark small{display:block;font-weight:500;font-size:.64rem;letter-spacing:.2em;
+    text-transform:uppercase;color:var(--blue);margin-top:.5rem}
   .specblock{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.64rem;
     line-height:1.6;color:var(--ink-soft);text-align:right;letter-spacing:.02em}
   .specblock b{color:var(--ink)}
 
-  .lede{font-size:1.05rem;line-height:1.55;max-width:62ch;margin:0 0 .6rem}
-  .lede.sub{color:var(--ink-soft);font-size:.98rem}
+  .lede{font-size:.95rem;line-height:1.6;max-width:70ch;margin:0 0 .6rem}
+  .lede.sub{color:var(--ink-soft);font-size:.9rem}
 
   section.panel{border:1px solid var(--rule);background:var(--panel);
     padding:1.4rem 1.5rem 1.6rem;margin:1.75rem 0;position:relative}
