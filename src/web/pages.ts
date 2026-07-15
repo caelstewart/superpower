@@ -18,10 +18,10 @@ function shell(title: string, body: string): string {
 <title>${esc(title)}</title>
 <style>
   :root{
-    --paper:#f5f3ee; --panel:#ffffff; --card:#ffffff; --ink:#1d1d1f; --ink-soft:#6e6e73;
-    --blue:#215d9c; --blue-soft:#eef3f9; --rule:#e7e3d9; --good:#1f8a54;
-    --warn:#8a5a00; --err:#c0392b; --grid:rgba(33,93,156,.028);
-    --shadow:0 1px 2px rgba(20,26,40,.05), 0 14px 34px -18px rgba(20,26,40,.14);
+    --paper:#e8e3d6; --panel:#f4f0e6; --card:#f8f5ec; --ink:#26241f; --ink-soft:#6f6a5e;
+    --blue:#2a5d94; --blue-soft:#e7ecdf; --rule:#d8d2c2; --good:#3a7a4e;
+    --warn:#8a6a1a; --err:#b04a34; --grid:rgba(90,80,55,.05);
+    --shadow:0 1px 2px rgba(60,52,34,.06), 0 12px 30px -16px rgba(60,52,34,.16);
     --sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Segoe UI",system-ui,Helvetica,Arial,sans-serif;
     --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
   }
@@ -73,7 +73,7 @@ function shell(title: string, body: string): string {
   form.term{display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-top:1.1rem}
   form.term label{color:var(--ink-soft);font-size:.92rem}
   input[type=email],input[type=password],input[type=text]{
-    background:#fff;border:1px solid #d9d4c8;color:var(--ink);font:inherit;
+    background:#fbf9f2;border:1px solid #d9d4c8;color:var(--ink);font:inherit;
     padding:.65rem .85rem;min-width:min(320px,70vw);border-radius:10px}
   input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-soft)}
   button{background:var(--blue);border:1px solid var(--blue);color:#fff;font:inherit;
@@ -82,7 +82,7 @@ function shell(title: string, body: string): string {
   button:hover{background:#1a4c82}
   button:active{transform:scale(.98)}
 
-  code.block,pre.block{display:block;background:#faf8f3;border:1px solid var(--rule);
+  code.block,pre.block{display:block;background:#efeadd;border:1px solid var(--rule);
     padding:.9rem 1.05rem;margin:.6rem 0;overflow-x:auto;border-radius:10px;
     font-family:var(--mono);font-size:.82em;white-space:pre;color:var(--ink)}
   table{border-collapse:collapse;width:100%;margin-top:.4rem}
@@ -112,16 +112,16 @@ function shell(title: string, body: string): string {
   .brief-label{display:block;font-size:.66rem;letter-spacing:.06em;text-transform:uppercase;
     color:var(--blue);font-weight:600;margin-bottom:.35rem}
   .real-tag{font-size:.62rem;letter-spacing:.04em;text-transform:uppercase;color:var(--good);
-    background:#e8f5ee;padding:.12rem .5rem;border-radius:20px;font-weight:600;
+    background:#e3ecd7;padding:.12rem .5rem;border-radius:20px;font-weight:600;
     vertical-align:middle;margin-left:.5rem}
   .card .pick{font-size:.7rem;letter-spacing:.02em;text-transform:uppercase;color:var(--blue);
     margin-top:.85rem;display:block;font-weight:600}
   .card.chosen{border-color:var(--blue);box-shadow:0 0 0 2px var(--blue)}
-  .card.reveal-good{border-color:var(--good);background:#f1f9f4}
+  .card.reveal-good{border-color:var(--good);background:#e9f0e0}
   .card.reveal-bad{opacity:.5}
   .verdict{font-size:.72rem;letter-spacing:.03em;text-transform:uppercase;margin-top:.8rem;font-weight:600}
   .verdict.good{color:var(--good)} .verdict.bad{color:var(--ink-soft)}
-  .quiz-result{border:1px solid var(--rule);background:linear-gradient(180deg,#fff,#fbfaf6);border-radius:16px;
+  .quiz-result{border:1px solid var(--rule);background:linear-gradient(180deg,#f6f2e9,#f1ecdf);border-radius:16px;
     box-shadow:var(--shadow);padding:1.9rem;margin-top:1.9rem;display:none}
   .quiz-result h3{font-size:1.5rem;margin-bottom:.8rem;text-wrap:balance;letter-spacing:-.02em;font-weight:700}
   .quiz-result .score{color:var(--blue);font-weight:800}

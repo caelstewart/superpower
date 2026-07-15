@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.1 — 2026-07-15
+
+- Palette fix: replaced the stark white panels with warm cream tones (cream
+  cards on slightly deeper paper), so the whole portal stays in one blueprint-
+  paper family. No white anywhere.
+
 ## 0.5.0 — 2026-07-15
 
 - Landing redesign: SF Pro (Apple system) typography, softened premium
