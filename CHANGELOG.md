@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.3.0 — 2026-07-14
+
+- Dynamic voice-fidelity check on every generation (blind-validated 2026-07-14:
+  fidelity-revised drafts beat baselines on both test briefs). A voice-agnostic
+  auditor reads the voice's OWN specimens, discovers its recurring signature
+  moves, and revises the draft to include any it missed — zero hardcoded
+  criteria. Adds ~2 model calls/generation; disable with SUPERPOWER_FIDELITY=off.
+  revise_copy (targeted user edits) intentionally skips it.
+
 ## 0.2.6 — 2026-07-14
 
 - Plan price $49→$20/mo

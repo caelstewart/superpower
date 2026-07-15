@@ -8,6 +8,8 @@ import type { GenerationResult, Voice } from "./types.js";
 import { buildGenerationMessages, buildRevisionMessages } from "./prompt.js";
 import { selectExemplars } from "./select.js";
 import { errorCount, lint, violationMessages } from "./lint.js";
+import { fidelityEnabled, findVoiceGaps } from "./fidelity.js";
+import type { ChatMessage } from "./types.js";
 
 /**
  * Revise an existing draft in-voice. Same validated structure as generation:
@@ -85,6 +87,7 @@ export async function reviseCopy(
     exemplarStates: states,
     lintFailures: errorCount(violations),
     revised,
+    fidelityApplied: false,
     durationMs: Date.now() - started,
     warnings,
   };
@@ -145,10 +148,45 @@ export async function generateCopy(
     }
     await new Promise((r) => setTimeout(r, attempt * 1500));
   }
+  const warnings: string[] = [];
+
+  // Dynamic voice-fidelity pass (validated 2026-07-14): discover this voice's
+  // signature moves from its own specimens and revise if the draft misses
+  // them. Voice-agnostic — criteria come from the examples, never hardcoded.
+  let fidelityApplied = false;
+  if (fidelityEnabled()) {
+    try {
+      const reference = specimens
+        .filter((s) => s.quality >= 5 && s.content_type === type)
+        .slice(0, 8);
+      const pool = reference.length >= 3 ? reference : specimens.filter((s) => s.quality >= 4).slice(0, 8);
+      const gaps = await findVoiceGaps(provider, pool, output);
+      if (gaps) {
+        const fidMessages: ChatMessage[] = [
+          ...messages,
+          { role: "assistant", content: output },
+          {
+            role: "user",
+            content:
+              `Revise the piece you just wrote to fix these gaps against your own style. ` +
+              `Keep the topic, facts, and structure; change only what these notes call for:\n\n${gaps}\n\n` +
+              `Return only the full revised piece.`,
+          },
+        ];
+        const improved = (await provider.chat(fidMessages, opts)).trim();
+        if (improved.split(/\s+/).filter(Boolean).length >= MIN_WORDS) {
+          output = improved;
+          fidelityApplied = true;
+        }
+      }
+    } catch (e) {
+      warnings.push(`fidelity check skipped: ${(e as Error).message}`);
+    }
+  }
+
   const rules = await store.listLintRules(voice.id);
   let violations = lint(output, rules);
   let revised = false;
-  const warnings: string[] = [];
 
   if (errorCount(violations) > 0) {
     revised = true;
@@ -170,6 +208,7 @@ export async function generateCopy(
     exemplarStates: states,
     lintFailures: errorCount(violations),
     revised,
+    fidelityApplied,
     durationMs: Date.now() - started,
     warnings,
   };

@@ -58,6 +58,7 @@ export interface GenerationResult {
   exemplarStates: { base: number; approved: number; archive: number };
   lintFailures: number;
   revised: boolean;
+  fidelityApplied: boolean;
   durationMs: number;
   warnings: string[];
 }

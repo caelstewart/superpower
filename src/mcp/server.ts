@@ -131,6 +131,7 @@ export function buildServer(store: Store): McpServer {
         `voice: ${v.id}`,
         `exemplars: ${result.exemplarCount} (${st.base} base, ${st.approved} approved, ${st.archive} archive)`,
         `model: ${result.model}`,
+        result.fidelityApplied ? "fidelity: revised to voice" : "fidelity: clean",
         result.revised ? "lint: revised once" : "lint: clean",
         ...result.warnings.map((w) => `warning: ${w}`),
       ].join(" · ");
