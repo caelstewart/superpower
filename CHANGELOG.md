@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.1 — 2026-07-15
+
+- Email: from "Cael from Superpower" with reply-to, properly-capitalized
+  human copy (was lowercase terminal styling that read as fake/phishy); real
+  HTML button. Subjects: "Your Superpower login link" / "Verify your email"
+- Portal buttons: dropped the ./ prefixes and --flag noise for plain labels
+  (Send login link, Log in, Rotate API key, Subscribe — $20/mo, etc.)
+
 ## 0.3.0 — 2026-07-14
 
 - Dynamic voice-fidelity check on every generation (blind-validated 2026-07-14:

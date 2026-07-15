@@ -123,7 +123,7 @@ export function landingPage(error?: string): string {
   <form class="term" method="POST" action="/signup">
     <label for="email">email:</label>
     <input type="email" id="email" name="email" required placeholder="you@company.com" autocomplete="email">
-    <button type="submit">./authenticate --send-link</button>
+    <button type="submit">Send login link</button>
   </form>
 </section>
 
@@ -133,7 +133,7 @@ export function landingPage(error?: string): string {
   <form class="term" method="POST" action="/dashboard">
     <label for="key">api_key:</label>
     <input type="password" id="key" name="key" required placeholder="sp_live_…" autocomplete="off">
-    <button type="submit">./login --key</button>
+    <button type="submit">Log in with key</button>
   </form>
 </section>`);
 }
@@ -148,9 +148,9 @@ export function checkEmailPage(email: string, devLink?: string): string {
   <p class="line dim">// nothing after a minute? check SPAM and the promotions tab for superpower@emails.mergelabs.co — or resend:</p>
   <form class="term" method="POST" action="/signup">
     <input type="hidden" name="email" value="${esc(email)}">
-    <button type="submit">./resend_link</button>
+    <button type="submit">Resend link</button>
   </form>
-  ${devLink ? `<p class="line warn">! dev mode (no email provider) — <a href="${esc(devLink)}">./authenticate</a></p><!-- dev-link: ${esc(devLink)} -->` : ""}
+  ${devLink ? `<p class="line warn">! dev mode (no email provider) — <a href="${esc(devLink)}">Log in</a></p><!-- dev-link: ${esc(devLink)} -->` : ""}
 </section>`);
 }
 
@@ -182,7 +182,7 @@ export function keyIssuedPage(account: Account, host: string, isNew: boolean): s
 <section class="panel">
   <h2>next</h2>
   <p class="line prompt">open a new session and say: "capture my writing voice" <span class="dim"># your agent walks you through it</span></p>
-  <p class="line prompt"><a href="/dashboard">./dashboard</a> <span class="dim"># billing + account, login with your key</span></p>
+  <p class="line prompt"><a href="/dashboard">Go to dashboard</a> <span class="dim"># billing + account, login with your key</span></p>
 </section>`);
 }
 
@@ -195,7 +195,7 @@ export function dashboardLoginPage(error?: string): string {
   <form class="term" method="POST" action="/dashboard">
     <label for="key">api_key:</label>
     <input type="password" id="key" name="key" required placeholder="sp_live_…" autocomplete="off">
-    <button type="submit">./login</button>
+    <button type="submit">Log in</button>
   </form>
   <p class="line dim" style="margin-top:.8rem">// no key? <a href="/">sign up</a></p>
 </section>`);
@@ -215,13 +215,13 @@ export function dashboardPage(account: Account, host: string, billing: BillingLi
       ? `<p class="line out">subscription <span class="status-active">ACTIVE</span> — plan: ${esc(account.plan)} ($20/mo)</p>
          ${
            billing.stripeEnabled
-             ? `<form class="term" method="POST" action="/billing/portal"><button type="submit">./manage_billing</button><span class="dim"># invoices, payment method, cancel — via stripe</span></form>`
+             ? `<form class="term" method="POST" action="/billing/portal"><button type="submit">Manage billing</button><span class="dim"># invoices, payment method, cancel — via stripe</span></form>`
              : ""
          }`
       : `<p class="line out">status: <span class="${statusClass}">${esc(account.stripe_status.toUpperCase())}</span> — plan: ${esc(account.plan)}</p>
          ${
            billing.stripeEnabled
-             ? `<form class="term" method="POST" action="/billing/checkout"><button type="submit">./activate_subscription --price 20/mo</button><span class="dim"># secure checkout via stripe</span></form>
+             ? `<form class="term" method="POST" action="/billing/checkout"><button type="submit">Subscribe — $20/mo</button><span class="dim"># secure checkout via stripe</span></form>
                 <p class="line dim">// activation is automatic within seconds of checkout completing.</p>`
              : `<p class="line warn">! billing not yet enabled on this deployment — your trial key works without limits for now.</p>`
          }`;
@@ -267,10 +267,10 @@ ${rotated ? `<p class="line warn">! key rotated — the previous key is now dead
 <section class="panel">
   <h2>account_actions</h2>
   <form class="term" method="POST" action="/account/rotate" onsubmit="return confirm('Rotate key? The current key stops working immediately — every connected tool must be updated.')">
-    <button type="submit">./rotate_api_key</button><span class="dim"># invalidates the old key instantly, then shows the new one here</span>
+    <button type="submit">Rotate API key</button><span class="dim"># invalidates the old key instantly, then shows the new one here</span>
   </form>
   <form class="term" method="POST" action="/logout">
-    <button type="submit">./logout</button>
+    <button type="submit">Log out</button>
   </form>
 </section>`);
 }
